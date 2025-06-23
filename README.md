@@ -1,6 +1,6 @@
 >[!NOTE]
 > MX Linux
->> to configure firewall rules for Samba, is a known issue, particularly with the Plasma firewall interface (plasma-firewall) interacting with the underlying firewall backend (often UFW - Uncomplicated Firewall).
+>> To configure firewall rules for Samba, is a known issue, particularly with the Plasma firewall interface (plasma-firewall) interacting with the underlying firewall backend (often UFW - Uncomplicated Firewall).
 
 This might be happening and what you can do:
 
