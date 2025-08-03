@@ -460,3 +460,130 @@ main_menu
 7.  **Initial UFW check at start:** The script now does a quick check for UFW at startup. If UFW is missing, it exits immediately with an error. If UFW is inactive, it issues a warning but allows the script to proceed, as the "All-in-One" option will prompt to enable it.
 
 To use the updated script, simply replace your existing `samba_firewall_manager.sh` content with this new code, save, and then run it with `sudo ./samba_firewall_manager.sh` as before.
+
+
+The key line is: `/dev/sda1 contains a exfat file system labelled 'Ventoy'`
+
+This tells us two crucial things:
+
+1.  **Your USB drive is `/dev/sda1`**. This is important, as it confirms which partition we need to target.
+2.  **The filesystem is `exfat`**. This is why `e2label` (for ext2/3/4 filesystems) and `mlabel` (for FAT/FAT32 filesystems) failed. ExFAT is a different filesystem type.
+
+To rename an ExFAT filesystem label, you need to use the `exfatlabel` command.
+
+**Here's how to rename your Ventoy USB drive (ExFAT) in MX Linux:**
+
+**1. Install `exfatprogs` (if you don't have it):**
+The `exfatlabel` command is part of the `exfatprogs` package. You'll likely need to install it first:
+
+```bash
+sudo apt update
+sudo apt install exfatprogs
+```
+
+**2. Unmount the USB drive:**
+It's crucial to unmount the drive before attempting to change its label.
+
+```bash
+sudo umount /dev/sda1
+```
+
+If you get an error like "target is busy," it means something is still accessing the drive. Close any file managers or terminal windows that might be open to the USB drive. You might even need to try `sudo umount -l /dev/sda1` (lazy unmount) if it persists, but a clean unmount is preferred.
+
+**3. Rename the ExFAT label:**
+Now, use the `exfatlabel` command. Replace `128GB_SanDisk` with your desired name.
+
+```bash
+sudo exfatlabel /dev/sda1 "128SanDisk"
+```
+
+*Note the quotes around the new label, especially if it contains spaces or special characters, although in this case, `128GB_SanDisk` doesn't strictly require them, it's good practice.*
+
+**4. Verify the new name:**
+After running the command, you can unplug and re-plug the USB drive, or simply check its status.
+
+```bash
+lsblk -f
+```
+
+The `-f` flag will show you the filesystem type (`FSTYPE`) and the label (`LABEL`). You should see `128GB_SanDisk` as the label for `/dev/sda1`. Your file manager should also display the new name.
+
+
+
+Here's another way how you can rename your Ventoy USB drive in MX Linux using the terminal.
+
+First, you'll need to identify the correct device name for your USB drive.
+
+**1. Identify your USB drive's device name:**
+
+Plug in your USB drive. Open a terminal and run the following command:
+
+```bash
+lsblk
+```
+
+Look for an entry that corresponds to your USB drive. It will likely be something like `/dev/sdb1`, `/dev/sdc1`, etc. You can usually identify it by its size or by the `Ventoy` label. For example, if your USB drive is `/dev/sdb1` and its current label is `Ventoy`.
+
+**2. Unmount the USB drive:**
+
+Before you can rename it, you need to unmount the partition. Replace `/dev/sdb1` with your actual device name.
+
+```bash
+sudo umount /dev/sdb1
+```
+
+If you get an error that it's not mounted, that's fine; just proceed to the next step.
+
+**3. Rename the USB drive:**
+
+Now you can use `e2label` or `mlabel` to rename the drive, depending on the filesystem type. Ventoy typically uses an ExFAT or FAT32 partition for the Ventoy data, and then creates a small FAT16 partition for booting. The name "Ventoy" you're seeing is likely the label of the main Ventoy data partition.
+
+  * **If your Ventoy partition is ExFAT or FAT32 (most common for the main data partition):**
+
+    You'll use the `mlabel` command. First, you might need to install `mtools` if you don't have it:
+
+    ```bash
+    sudo apt update
+    sudo apt install mtools
+    ```
+
+    Then, rename the drive (replace `/dev/sdb1` with your device and `MyNewDrive` with your desired name):
+
+    ```bash
+    sudo mlabel -i /dev/sdb1 ::MyNewDrive
+    ```
+
+    Note the `::` before the new label.
+
+  * **If your Ventoy partition is ext2/ext3/ext4 (less common for Ventoy's main data partition, but possible for other Linux filesystems):**
+
+    You'll use the `e2label` command:
+
+    ```bash
+    sudo e2label /dev/sdb1 MyNewDrive
+    ```
+
+    (Replace `/dev/sdb1` with your device and `MyNewDrive` with your desired name.)
+
+**4. Verify the new name:**
+
+After renaming, you can plug in your USB drive again (or unmount and remount it if it was already plugged in). Then, run `lsblk` again or check your file manager to see if the name has changed.
+
+```bash
+lsblk
+```
+
+You should now see `MyNewDrive` (or whatever you named it) instead of `Ventoy`.
+
+**Example Workflow:**
+
+Let's say your USB drive is `/dev/sdb1` and you want to rename it to `VentoyBoot`.
+
+1.  **Identify:** `lsblk` shows `/dev/sdb1` as `Ventoy`.
+2.  **Unmount:** `sudo umount /dev/sdb1`
+3.  **Rename (assuming ExFAT/FAT32):** `sudo mlabel -i /dev/sdb1 ::VentoyBoot`
+4.  **Verify:** `lsblk` shows `/dev/sdb1` as `VentoyBoot`.
+
+
+
+
