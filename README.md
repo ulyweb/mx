@@ -585,5 +585,15 @@ Let's say your USB drive is `/dev/sdb1` and you want to rename it to `VentoyBoot
 4.  **Verify:** `lsblk` shows `/dev/sdb1` as `VentoyBoot`.
 
 
+## Installation Script for QEMU/KVM and Utilities
+````
+sudo apt update
+sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system virt-manager ovmf swtpm swtpm-tools virtiofsd bridge-utils
+sudo usermod -aG libvirt $USER
+````
 
-
+## KVM Guest Windows VirtIO Drivers
+````
+https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md
+https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.285-1/virtio-win.iso
+````
