@@ -599,10 +599,11 @@ https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/
 ````
 
 
-## Apps to have
+## Default apps by FerenOS - Good to have with your MX
 
 1.  **FileManager:** `Nemo v5.8.5`
 2.  **Browser:** `Vivaldi v7.7.3851.67`
 3.  **Document Scanner:** `Document Scanner v42.0 by simple-scan` from `gitlab.gnome.org/GNOME/simple-scan`
 4.  **Spectacle:** `Spectacle` best for screenshot
 5.  **Konsole:** `Konsole v23.08.4` good terminal
+6.  **Webcam App:** `Kamoso'
