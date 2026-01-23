@@ -607,3 +607,11 @@ https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/
 4.  **Spectacle:** `Spectacle` best for screenshot
 5.  **Konsole:** `Konsole v23.08.4` good terminal
 6.  **Webcam App:** `Kamoso'
+
+
+
+## 128GB USB allocation partitions
+
+1.  **RootFS:** `24 => 25GiB`
+2.  **HomeFS:** `33 => 60GiB`
+3.  **Swap:** `15 => 8GiB`
