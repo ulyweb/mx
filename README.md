@@ -597,3 +597,12 @@ sudo usermod -aG libvirt $USER
 https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md
 https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.285-1/virtio-win.iso
 ````
+
+
+## Apps to have
+
+1.  **FileManager:** `Nemo v5.8.5`
+2.  **Browser:** `Vivaldi v7.7.3851.67`
+3.  **Document Scanner:** `Document Scanner v42.0 by simple-scan` from `gitlab.gnome.org/GNOME/simple-scan`
+4.  **Spectacle:** `Spectacle` best for screenshot
+5.  **Konsole:** `Konsole v23.08.4` good terminal
