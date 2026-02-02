@@ -351,3 +351,200 @@ If you want, I can still generate a script that edits:
 Firefox is the only browser that supports full configuration automation cleanly.
 
 ---
+
+### Combined automation script for Firefox + Chromium browsers
+
+Here’s a single Python script that:
+
+- Forces install of uBlock Origin + Ghostery in **Firefox, Chrome, Brave, Edge, Vivaldi**
+- Applies your **privacy/UX preferences in Firefox** (via `policies.json` + `user.js`)
+- Applies **partial privacy settings in Chromium browsers** (passwords, autofill, payments, suggestions, telemetry) via policies
+
+---
+
+#### 1. Save this as `browser_setup.py`
+
+```python
+#!/usr/bin/env python3
+import os
+import json
+import glob
+
+# -----------------------------
+# 1. Chromium-based browsers
+# -----------------------------
+
+chromium_browsers = {
+    "google-chrome": "/etc/opt/chrome/policies/managed",
+    "brave-browser": "/etc/brave/policies/managed",
+    "microsoft-edge": "/etc/opt/edge/policies/managed",
+    "vivaldi": "/etc/vivaldi/policies/managed",
+}
+
+# Chrome extension IDs
+chromium_extensions = [
+    "cjpalhdlnbpafiamejdnhcphjbkeiagm",  # uBlock Origin
+    "mlomiejdfkolichcflejclcbmpeaniij",  # Ghostery
+]
+
+chromium_policy = {
+    "ExtensionInstallForcelist": chromium_extensions,
+    # Passwords / autofill / payments
+    "PasswordManagerEnabled": False,
+    "AutofillAddressEnabled": False,
+    "AutofillCreditCardEnabled": False,
+    "PaymentMethodQueryEnabled": False,
+    # Suggestions / data collection
+    "SearchSuggestEnabled": False,
+    "URLKeyedAnonymizedDataCollectionEnabled": False,
+    "MetricsReportingEnabled": False,
+}
+
+def ensure_dir(path):
+    os.makedirs(path, exist_ok=True)
+
+def apply_chromium_policies():
+    for name, path in chromium_browsers.items():
+        ensure_dir(path)
+        policy_file = os.path.join(path, "browser_policies.json")
+        with open(policy_file, "w") as f:
+            json.dump(chromium_policy, f, indent=4)
+        print(f"[OK] Chromium policy applied for {name} → {policy_file}")
+
+# -----------------------------
+# 2. Firefox enterprise policies
+# -----------------------------
+
+firefox_policies_dir = "/etc/firefox/policies"
+firefox_policies_file = os.path.join(firefox_policies_dir, "policies.json")
+
+firefox_policies = {
+    "policies": {
+        # Extensions
+        "Extensions": {
+            "Install": [
+                "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi",
+                "https://addons.mozilla.org/firefox/downloads/latest/ghostery/latest.xpi",
+            ]
+        },
+        # Passwords / form history
+        "OfferToSaveLogins": False,
+        "PasswordManagerEnabled": False,
+        "DisableFormHistory": True,
+        # Telemetry / data collection
+        "DisableTelemetry": True,
+        "DisableFirefoxStudies": True,
+        "DisablePocket": True,
+    }
+}
+
+def apply_firefox_policies():
+    ensure_dir(firefox_policies_dir)
+    with open(firefox_policies_file, "w") as f:
+        json.dump(firefox_policies, f, indent=4)
+    print(f"[OK] Firefox policies.json written → {firefox_policies_file}")
+
+# -----------------------------
+# 3. Firefox user.js preferences
+# -----------------------------
+
+def find_firefox_profiles():
+    root = os.path.expanduser("~/.mozilla/firefox")
+    if not os.path.isdir(root):
+        return []
+    # Match default profiles
+    patterns = ["*.default", "*.default-release", "*.default-esr"]
+    profiles = []
+    for pattern in patterns:
+        profiles.extend(glob.glob(os.path.join(root, pattern)))
+    return profiles
+
+firefox_prefs = {
+    # Home → Firefox Home Content / Interaction
+    "browser.newtabpage.activity-stream.showSearch": False,
+    "browser.newtabpage.activity-stream.feeds.section.topstories": False,
+    "browser.newtabpage.activity-stream.feeds.topsites": False,
+    "browser.newtabpage.activity-stream.feeds.weatherfeed": False,
+    "browser.newtabpage.activity-stream.showSponsored": False,
+    "browser.newtabpage.activity-stream.showSponsoredTopSites": False,
+    "browser.newtabpage.activity-stream.showWeather": False,
+    "browser.newtabpage.activity-stream.showRecentSearches": False,
+    "browser.newtabpage.activity-stream.showRecentSaves": False,
+
+    # Search suggestions
+    "browser.search.suggest.enabled": False,
+    "browser.urlbar.suggest.searches": False,
+    "browser.urlbar.suggest.quicksuggest.nonsponsored": False,
+    "browser.urlbar.suggest.quicksuggest.sponsored": False,
+    "browser.urlbar.suggest.bookmark": False,
+    "browser.urlbar.suggest.history": False,
+    "browser.urlbar.suggest.openpage": False,
+
+    # Passwords
+    "signon.rememberSignons": False,
+    "signon.autofillForms": False,
+
+    # Payment & autofill
+    "dom.payments.request.enabled": False,
+    "extensions.formautofill.addresses.enabled": False,
+    "extensions.formautofill.creditCards.enabled": False,
+
+    # Firefox data collection and telemetry
+    "datareporting.healthreport.uploadEnabled": False,
+    "toolkit.telemetry.enabled": False,
+    "toolkit.telemetry.unified": False,
+    "toolkit.telemetry.archive.enabled": False,
+    "toolkit.telemetry.server": "",
+    "toolkit.telemetry.newProfilePing.enabled": False,
+    "toolkit.telemetry.shutdownPingSender.enabled": False,
+    "toolkit.telemetry.updatePing.enabled": False,
+    "toolkit.telemetry.bhrPing.enabled": False,
+    "toolkit.telemetry.firstShutdownPing.enabled": False,
+    "browser.ping-centre.telemetry": False,
+}
+
+def apply_firefox_userjs():
+    profiles = find_firefox_profiles()
+    if not profiles:
+        print("[WARN] No Firefox profile found under ~/.mozilla/firefox")
+        return
+
+    for profile in profiles:
+        userjs_path = os.path.join(profile, "user.js")
+        with open(userjs_path, "w") as f:
+            for key, value in firefox_prefs.items():
+                if isinstance(value, bool):
+                    f.write(f'user_pref("{key}", {str(value).lower()});\n')
+                else:
+                    f.write(f'user_pref("{key}", "{value}");\n')
+        print(f"[OK] Firefox user.js written → {userjs_path}")
+
+# -----------------------------
+# Main
+# -----------------------------
+
+if __name__ == "__main__":
+    print("Applying Chromium policies...")
+    apply_chromium_policies()
+    print("\nApplying Firefox policies...")
+    apply_firefox_policies()
+    print("\nApplying Firefox user.js preferences...")
+    apply_firefox_userjs()
+    print("\nAll done. Restart each browser to see changes.")
+```
+
+---
+
+#### 2. Run it with sudo
+
+From the folder where you saved it:
+
+```bash
+sudo chmod +x browser_setup.py
+sudo ./browser_setup.py
+```
+
+Then fully close and reopen each browser.
+
+---
+
