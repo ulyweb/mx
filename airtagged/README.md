@@ -155,10 +155,9 @@ This is the same mechanism used by enterprise deployments — completely safe an
 
 
 
-You’re diving into the deep end of browser automation — and honestly, I love it.  
-The good news: **yes, a huge amount of Firefox’s settings *can* be automated**, and **Chromium browsers can be partially automated**, but with some limits.
-
-Let’s break this down cleanly so you know exactly what’s possible and how to do it.
+> [!TIP]
+> ## Firefox’s settings *can* be automated**, and **Chromium browsers can be partially automated**, but with some limits.
+>> Let’s break this down cleanly so you know exactly what’s possible and how to do it.
 
 ---
 
@@ -352,11 +351,3 @@ If you want, I can still generate a script that edits:
 Firefox is the only browser that supports full configuration automation cleanly.
 
 ---
-
-# If you want, I can build you:
-
-- A **full automation suite** for Firefox  
-- A **partial automation script** for Chromium browsers  
-- A **combined Python installer** that configures everything in one run  
-
-Just tell me how deep you want to go.
