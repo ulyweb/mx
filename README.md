@@ -615,3 +615,73 @@ https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/
 1.  **RootFS:** `24 => 25GiB`
 2.  **HomeFS:** `33 => 60GiB`
 3.  **Swap:** `15 => 8GiB`
+
+
+
+
+
+
+
+> [!TIP]
+> ## Clean pattern here, so you can delete all versions **except** `vault_gui_v13` with a single safe command.
+
+
+Since your files are named like:
+
+```
+vault_gui_v1
+vault_gui_v2
+vault_gui_v3
+...
+vault_gui_v13
+```
+
+and you want to **keep v13**, here are the safest options.
+
+---
+
+# ✔️ Option 1 — Delete everything except v13 (simple pattern)
+
+If the files are all in the same folder:
+
+```
+rm vault_gui_v{1..12}
+```
+
+That removes versions 1 through 12 and leaves `vault_gui_v13` untouched.
+
+---
+
+# ✔️ Option 2 — Delete using a wildcard (safer with confirmation)
+
+```
+rm -i vault_gui_v*
+```
+
+Then press **n** when it asks about deleting `vault_gui_v13`.
+
+This is slower but safer if you want to double‑check each deletion.
+
+---
+
+# ✔️ Option 3 — Delete all matching files except one (advanced)
+
+```
+ls vault_gui_v* | grep -v "vault_gui_v13" | xargs rm
+```
+
+This finds all files starting with `vault_gui_v` and deletes everything except the one containing `v13`.
+
+---
+
+# ⚠️ Quick safety reminder
+
+Before deleting, you can preview what will be removed:
+
+```
+ls vault_gui_v*
+```
+
+Always good to double‑check before running `rm`.
+
+---
