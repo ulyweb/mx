@@ -124,6 +124,7 @@ install_utilities() {
         git
         unzip
         zip
+        qrencode
     )
 
     for p in "${pkgs[@]}"; do
