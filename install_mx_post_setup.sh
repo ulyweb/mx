@@ -93,7 +93,6 @@ system_update() {
 configure_firewall_samba() {
     echo "=== Firewall + Samba Configuration ==="
 
-    # Ensure ufw is installed
     ensure_pkg ufw
 
     echo "[+] Allowing Samba and related ports..."
@@ -174,7 +173,7 @@ install_python_stack() {
         libsqlite3-dev
         libffi-dev
         libbz2-dev
-        libreadline-gplv2-dev
+        libreadline-dev
         libncursesw5-dev
         tk-dev
         libxml2-dev
@@ -244,7 +243,6 @@ install_media_tools() {
 install_docker() {
     echo "=== Installing Docker + Docker Compose ==="
 
-    # Basic dependencies
     sudo apt update
     sudo apt install -y \
         ca-certificates \
@@ -252,7 +250,6 @@ install_docker() {
         gnupg \
         lsb-release
 
-    # Docker repo
     if [ ! -f /etc/apt/keyrings/docker.gpg ]; then
         echo "[+] Adding Docker GPG key and repository..."
         sudo mkdir -p /etc/apt/keyrings
@@ -261,8 +258,6 @@ install_docker() {
         echo \
           "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
           $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    else
-        echo "[OK] Docker GPG key already present."
     fi
 
     sudo apt update
@@ -294,16 +289,12 @@ install_zsh_ohmyzsh() {
         echo "[+] Changing default shell to zsh for $USER..."
         chsh -s "$(command -v zsh)"
         echo "   Log out and back in for shell change to take effect."
-    else
-        echo "[OK] Zsh already the default shell."
     fi
 
     if [ ! -d "$HOME/.oh-my-zsh" ]; then
         echo "[+] Installing Oh-My-Zsh..."
         RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    else
-        echo "[OK] Oh-My-Zsh already installed."
     fi
 }
 
@@ -320,7 +311,6 @@ run_all() {
     install_media_tools
     echo
     echo "Core setup complete."
-    echo "You can optionally install Docker and Zsh/Oh-My-Zsh from the menu."
 }
 
 # ---------------------------------------------------------
