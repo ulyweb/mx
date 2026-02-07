@@ -2,6 +2,18 @@
 > MX Linux
 >> To configure firewall rules for Samba, is a known issue, particularly with the Plasma firewall interface (plasma-firewall) interacting with the underlying firewall backend (often UFW - Uncomplicated Firewall).
 
+
+# 🟢 Final Recommendation  
+Use this one:
+
+```
+bash <(curl -fsSL https://raw.githubusercontent.com/ulyweb/mx/refs/heads/main/install_mx_post_setup.sh)
+```
+
+It’s clean, safe, fast, and fully compatible with your setup.
+
+
+
 This might be happening and what you can do:
 
 **Why it's happening:**
