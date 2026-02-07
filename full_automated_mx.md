@@ -1,4 +1,4 @@
-Got you—let’s make this one single, complete, copy‑pasteable script that does **everything**:
+# This one single, complete, copy‑pasteable script that does **everything**:
 
 - Installs the full MX post‑install tool into `~/scripts/mx_post_install.sh`
 - Makes it executable
