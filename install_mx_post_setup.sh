@@ -168,8 +168,6 @@ install_python_stack() {
         python3-full
         python3-pip
         python3-venv
-        python3-mnemonic
-        python3-tk
         build-essential
         libssl-dev
         zlib1g-dev
@@ -204,6 +202,7 @@ install_python_libraries() {
 
     local pkgs=(
         python3-cryptography
+        python3-mnemonic
         python3-tk
         python3-psutil
         python3-pyinstaller
