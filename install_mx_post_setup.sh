@@ -168,6 +168,7 @@ install_python_stack() {
         python3-full
         python3-pip
         python3-venv
+        python3-mnemonic
         build-essential
         libssl-dev
         zlib1g-dev
