@@ -215,6 +215,7 @@ install_python_libraries() {
         python3-yaml
         python3-lxml
         python3-sqlalchemy
+        python3-qrcode
         python3-pil
     )
 
