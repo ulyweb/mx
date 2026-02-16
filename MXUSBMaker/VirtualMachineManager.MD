@@ -220,7 +220,8 @@ Your host OS cannot be compromised by the VM, and vice‑versa.
 ---
 
 
-# 🧩 1. Let’s build this like an infrastructure person.
+# 🧩 Let’s build it like an infrastructure person.
+
 
 ## I’ll walk you through:
 
