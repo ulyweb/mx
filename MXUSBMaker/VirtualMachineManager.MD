@@ -1,5 +1,3 @@
----
-
 # 🧩 1. The Best Virtualization Stack for MX‑25.1
 
 MX Linux (especially MX‑25.1) is Debian‑based and plays extremely well with:
