@@ -220,9 +220,9 @@ Your host OS cannot be compromised by the VM, and vice‑versa.
 ---
 
 
-— let’s build this like an infrastructure person, not a casual user.
+# Let’s build this like an infrastructure person, not a casual user.
 
-I’ll walk you through:
+## I’ll walk you through:
 
 1. Installing KVM + QEMU + libvirt + Virt‑Manager on MX‑25.1  
 2. Verifying hardware virtualization is actually working  
