@@ -697,3 +697,30 @@ ls vault_gui_v*
 Always good to double‑check before running `rm`.
 
 ---
+
+
+The error message **"network 'default' is not active"** means that the underlying virtual network service that `libvirt` (the backend for Virtual Machine Manager) uses to connect your VM to the internet hasn't been started. You can also see this in your screenshot where the Network source says "(Inactive)".
+
+To fix this permanently, you just need to start the default network and set it to run automatically when your computer boots up. You can do this easily through either the graphical interface or the terminal.
+
+### Method 1: The Graphical Way (Using virt-manager)
+
+1. Close the VM settings window and go to the main **Virtual Machine Manager** window (the one that lists all your VMs).
+2. In the top menu bar, click on **Edit**, then select **Connection Details**.
+3. Go to the **Virtual Networks** tab.
+4. Select the **default** network from the list on the left.
+5. Click the **Play** (Start) button at the bottom left of that window to activate the network.
+6. **Important:** Check the box next to **Autostart On Boot**. This ensures the network starts automatically every time you turn on your MX Linux machine.
+7. Click **Apply** and close the window.
+
+### Method 2: The Command Line Way (Using Terminal)
+
+If you prefer the terminal, you can fix it in seconds with two commands. Open your terminal and run:
+
+1. **Start the network right now:**
+`sudo virsh net-start default`
+2. **Set it to start automatically on boot:**
+`sudo virsh net-autostart default`
+
+Once you do either of these methods, the network will be active, and your VM will boot up without throwing that error again.
+
