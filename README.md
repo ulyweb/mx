@@ -724,3 +724,17 @@ If you prefer the terminal, you can fix it in seconds with two commands. Open yo
 
 Once you do either of these methods, the network will be active, and your VM will boot up without throwing that error again.
 
+
+update
+
+Method 2: Using a Graphical Application (QtQr)
+For users who prefer a graphical interface, QtQr is an easy-to-use option. 
+LinuxConfig
+LinuxConfig
+Open the terminal.
+Install QtQr using the apt command:
+bash
+sudo apt install qtqr
+Launch the application from your MX Linux application menu.
+Enter your data (URL, email, phone number, etc.) in the provided field.
+The QR code will be generated and displayed automatically. You can then customize settings like pixel size and save the code as a PNG image file. 
