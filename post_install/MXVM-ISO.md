@@ -459,4 +459,4 @@ and Here's for BlissOS Android XML file.
 </domain>
 ```
 
-You can download the BlissOS from here: https://bassos.navotpala.tech/s/77e038bd
+You can download the BlissOS from here: https://github.com/BlissRoms-x86/manifest/tree/arcadia-x86
