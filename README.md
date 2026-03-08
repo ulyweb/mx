@@ -738,3 +738,16 @@ sudo apt install qtqr
 Launch the application from your MX Linux application menu.
 Enter your data (URL, email, phone number, etc.) in the provided field.
 The QR code will be generated and displayed automatically. You can then customize settings like pixel size and save the code as a PNG image file. 
+
+
+Additional installation after post install of MX.
+
+````
+sudo apt-get install -y libzbar0, python3-pil.imagetk python3-crythography python3-qrcode python3-opencv python3-pyzbar pyzbar python3-PIL 
+sudo apt install qemu-system-gui qemu-system-x86 spice-client-gtk spice-vdagent gir1.2-spiceclientgtk-3.0 -y
+sudo apt update\nsudo apt install spice-vdagent -y
+sudo apt install -y qtqr  guvcview gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-tools
+flatpak install flathub com.belmoussaoui.Decoder
+sudo virsh net-start default
+sudo virsh net-autostart default
+````
