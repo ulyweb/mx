@@ -200,3 +200,47 @@ sudo apt install spice-vdagent
 Reboot the VM once that is installed, and you should be able to copy from your Dell and paste directly into the VM!
 
 
+
+
+Master cheat sheet for building the fastest, most stable virtual machines in Virt-Manager.
+
+Because Virt-Manager doesn't natively apply the absolute best performance tweaks out-of-the-box, applying these specific settings during the "Customize configuration before install" step will save you massive amounts of headaches later.
+
+### Virt-Manager Best Settings Cheat Sheet
+
+| Hardware Component | Windows (10 & 11) | Linux (MX, Ubuntu, etc.) | Android-x86 (BlissOS) |
+| --- | --- | --- | --- |
+| **Chipset / Machine** | Q35 | Q35 | i440fx |
+| **Firmware** | UEFI (OVMF) + TPM | BIOS or UEFI | BIOS (SeaBIOS) |
+| **CPU Model** | `host-passthrough` | `host-passthrough` | `host-passthrough` |
+| **Disk Bus** | Virtio *(Requires Driver)* | Virtio | IDE or SATA |
+| **Network Device** | Virtio *(Requires Driver)* | Virtio | e1000 |
+| **Display Protocol** | VNC Server | VNC Server | VNC Server |
+| **Video Model** | Virtio or QXL | Virtio | VGA *(Edit XML to 64MB)* |
+| **Sound Model** | ich9 | ich9 | ac97 |
+
+---
+
+### The 3 Golden Rules of KVM/QEMU Performance
+
+**1. Always Use `host-passthrough` for the CPU**
+By default, Virt-Manager emulates a generic, heavily restricted CPU (often called "QEMU Virtual CPU"). This robs you of your Dell's actual processing power. Changing the CPU model to `host-passthrough` lets the VM talk directly to your physical processor, unlocking massive speed boosts and hardware acceleration.
+
+**2. Use Virtio for Disks and Network**
+Whenever possible, use the **Virtio** bus type for your virtual hard drives and network cards. Standard IDE or SATA emulation is incredibly slow. Virtio bypasses the emulation bottleneck entirely.
+
+* *Note for Windows:* Windows does not have Virtio drivers built-in. You have to temporarily attach a second virtual CD-ROM drive containing the Red Hat "virtio-win" drivers during installation to see your hard drive.
+
+**3. The Audio XML Workaround is Mandatory**
+As long as you are forced to use the VNC Display protocol, the Virt-Manager setup wizard will permanently mute your VM. You will always need to do that quick 10-second XML edit after creating the soundcard:
+
+```xml
+<audio id="1" type="pulseaudio"/>
+<sound model="ich9">
+  <audio id="1"/>
+</sound>
+
+```
+
+*(Remember to use `ac97` instead of `ich9` for Android VMs!)*
+
