@@ -1,4 +1,4 @@
-I would be happy to help you get that set up!
+
 
 Normally, Virt-Manager uses the SPICE display protocol to handle copy-and-paste natively, but since we know SPICE is missing from your host's QEMU packages, we have to use a clever workaround to force the VNC display to accept clipboard sharing instead.
 
@@ -199,4 +199,4 @@ sudo apt install spice-vdagent
 
 Reboot the VM once that is installed, and you should be able to copy from your Dell and paste directly into the VM!
 
-Since the clipboard only handles text, would you like to set up a shared network folder so you can quickly drag and drop actual files between the two operating systems?
+
