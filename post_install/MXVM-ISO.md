@@ -1,4 +1,69 @@
 
+That `Permission denied` error is exactly what happens when your Linux host's security (AppArmor or standard permissions) steps in.
+
+Here is what's happening behind the scenes: Virt-Manager runs your virtual machines using a restricted, invisible background user (usually called `libvirt-qemu`). That restricted user is trying to connect to your audio server, but it is strictly forbidden from looking inside your personal `uly` folder (`/run/user/1000/`).
+
+You have two ways to fix this. You can either do the "proper" fix (which tells Virt-Manager to run the VM as *you* so it has permission to use your audio), or the "quick" fix (which drops PulseAudio entirely).
+
+### Option 1: The Proper Fix (Recommended)
+
+This method keeps PulseAudio (which provides the best sound quality and mixing) by telling the virtualization engine to run under your username instead of the restricted user.
+
+1. Open your **Terminal**.
+2. Open the QEMU configuration file in a text editor with root privileges by running:
+```bash
+sudo nano /etc/libvirt/qemu.conf
+
+```
+
+
+3. Scroll down (or use `Ctrl+W` to search) until you find these two lines. They will likely have a `#` in front of them:
+```text
+#user = "root"
+#group = "root"
+
+```
+
+
+*(Note: Depending on the Debian version, it might say "libvirt-qemu" instead of "root")*
+4. Delete the `#` to uncomment them, and change the values to your exact username, so they look exactly like this:
+```text
+user = "uly"
+group = "uly"
+
+```
+
+
+5. Save the file by pressing `Ctrl+O` and then `Enter`. Exit by pressing `Ctrl+X`.
+6. Restart the virtualization service to apply the changes:
+```bash
+sudo systemctl restart libvirtd
+
+```
+
+
+7. Start your BlissOS VM. It should now boot perfectly with sound.
+
+---
+
+### Option 2: The Quick Fix (ALSA Fallback)
+
+If you don't want to mess with system configuration files, we can use the "nuclear option" I mentioned in my last message. This bypasses PulseAudio and its permissions entirely.
+
+1. Open your **Virt-Manager**, click **Overview**, and go to the **XML** tab.
+2. Find the audio line we added: `<audio id="1" type="pulseaudio"/>`
+3. Change `pulseaudio` to `alsa` so it looks like this:
+```xml
+<audio id="1" type="alsa"/>
+
+```
+
+
+4. Click **Apply** and start the VM.
+
+I highly recommend trying **Option 1** first, as PulseAudio/PipeWire plays much nicer with MX Linux when you have multiple things making sound at once.
+
+-
 
 Normally, Virt-Manager uses the SPICE display protocol to handle copy-and-paste natively, but since we know SPICE is missing from your host's QEMU packages, we have to use a clever workaround to force the VNC display to accept clipboard sharing instead.
 
