@@ -53,7 +53,7 @@ curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json"
 
   ---
   Comparison:
-``chart
+```chart
   ┌──────────────────────────────┬───────┬───────────┬────────────┬───────────────────────────────┐
   │            Model             │ Size  │  Coding   │ Uncensored │           Best for            │
   ├──────────────────────────────┼───────┼───────────┼────────────┼───────────────────────────────┤
@@ -65,6 +65,6 @@ curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json"
   ├──────────────────────────────┼───────┼───────────┼────────────┼───────────────────────────────┤
   │ codellama:13b                │ 7.4GB │ Good      │ Partial    │ Older, outclassed by above    │
   └──────────────────────────────┴───────┴───────────┴────────────┴───────────────────────────────┘
-``
+```
   ---
   ### My recommendation: start with qwen2.5-coder:7b — it's the sweet spot. If you find it hitting its limits on complex tasks, upgrade to deepseek-coder-v2. You already have dolphin-llama3 for general conversation and non-coding tasks.
