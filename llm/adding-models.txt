@@ -34,14 +34,17 @@ curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json"
   ---
 Top pick:
 # Best coding + uncensored combo (~4.7GB)
+```
 curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json" -d '{"name":"qwen2.5-coder:7b","stream":true}'
+```
 #  qwen2.5-coder:7b — Alibaba's dedicated coding model. Excellent at bash, Python, JS, and system scripting. Far less censored than most coding models. Best size-to-performance ratio.
 
   ---
 Runner up (if you have RAM):
 # Stronger but larger (~9GB)
+```
 curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json" -d '{"name":"deepseek-coder-v2","stream":true}'
-
+```
 #  deepseek-coder-v2 — arguably the best coding model on Ollama. Handles complex scripts, refactoring, and multi-file logic very well. Needs more RAM though.
 
   ---
