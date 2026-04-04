@@ -1,40 +1,44 @@
-No need to create the folder manually — Ollama creates it automatically when it pulls a model. Here's how to add models:
+#  Here's how to add models:
 
 The script must be running first (so the bundled Ollama is active on port 11434), then open a second terminal and run:
-
+```bash
 curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json" -d '{"name":"MODEL_NAME","stream":true}'
+```
+> Replace MODEL_NAME with any model from https://ollama.com/library.
 
-  Replace MODEL_NAME with any model from https://ollama.com/library.
+>>Examples:
+# Llama 3.2 (fast, general purpose ~2GB)
+```bash
+curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json" -d '{"name":"llama3.2","stream":true}'
+```
+# Mistral (strong reasoning ~4GB)
+```bash
+curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json" -d '{"name":"mistral","stream":true}'
+```
+# Phi-3 Mini (very fast, lightweight ~2GB)
+```bash
+curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json" -d '{"name":"phi3","stream":true}'
+```
+# Check what models are already on the USB:
+```bash
+curl http://localhost:11434/api/tags | python3 -m json.tool
+```
+# Check models stored on USB directly:
+```bash
+ls /media/uly/PortableAI/anythingllm_data/ollama_models/manifests/registry.ollama.ai/library/
+```
 
-  Examples:
-  # Llama 3.2 (fast, general purpose ~2GB)
-  curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json" -d '{"name":"llama3.2","stream":true}'
+>> ## Models download directly to the USB at anythingllm_data/ollama_models/ because the script sets OLLAMA_MODELS to that path before launching — Ollama inherits it and stores everything there automatically.
 
-  # Mistral (strong reasoning ~4GB)
-  curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json" -d '{"name":"mistral","stream":true}'
-
-  # Phi-3 Mini (very fast, lightweight ~2GB)
-  curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json" -d '{"name":"phi3","stream":true}'
-
-  Check what models are already on the USB:
-  curl http://localhost:11434/api/tags | python3 -m json.tool
-
-  Check models stored on USB directly:
-  ls /media/uly/PortableAI/anythingllm_data/ollama_models/manifests/registry.ollama.ai/library/
-
-  Models download directly to the USB at anythingllm_data/ollama_models/ because the script sets OLLAMA_MODELS to that path before launching — Ollama inherits it and
-  stores everything there automatically.
-
-
-
-   in your opinion which model should i get for programming and scripting uncensor is the best model?
+-
 
 ● For programming + scripting + uncensored, here's my honest ranking:
 
-  ---
-Top pick:
+---
+## Top pick:
+
 # Best coding + uncensored combo (~4.7GB)
-```
+```bash
 curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json" -d '{"name":"qwen2.5-coder:7b","stream":true}'
 ```
 #  qwen2.5-coder:7b — Alibaba's dedicated coding model. Excellent at bash, Python, JS, and system scripting. Far less censored than most coding models. Best size-to-performance ratio.
@@ -42,7 +46,7 @@ curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json"
   ---
 Runner up (if you have RAM):
 # Stronger but larger (~9GB)
-```
+```bash
 curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json" -d '{"name":"deepseek-coder-v2","stream":true}'
 ```
 #  deepseek-coder-v2 — arguably the best coding model on Ollama. Handles complex scripts, refactoring, and multi-file logic very well. Needs more RAM though.
