@@ -67,4 +67,4 @@ curl -X POST http://localhost:11434/api/pull -H "Content-Type: application/json"
   └──────────────────────────────┴───────┴───────────┴────────────┴───────────────────────────────┘
 ````
   ---
-  ### My recommendation: start with qwen2.5-coder:7b — it's the sweet spot. If you find it hitting its limits on complex tasks, upgrade to deepseek-coder-v2. You already have dolphin-llama3 for general conversation and non-coding tasks.
+  ####__My recommendation: start with qwen2.5-coder:7b — it's the sweet spot. If you find it hitting its limits on complex tasks, upgrade to deepseek-coder-v2. You already have dolphin-llama3 for general conversation and non-coding tasks.__
