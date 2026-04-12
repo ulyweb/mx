@@ -2,7 +2,7 @@ This combined script creates a comprehensive directory tree that includes both y
 ## The Unified "Master" Script
 Save this as generate_master.sh:
 
-#!/bin/bash# Combined VeraCrypt Outer Volume Decoy Generator
+#!/bin/bash# Combined VeraCrypt Outer Volume Master Generator
 
 TARGET_DIR="$1"if [ -z "$TARGET_DIR" ] || [ ! -d "$TARGET_DIR" ]; then
     echo "Error: Please mount your outer volume and provide the path."
