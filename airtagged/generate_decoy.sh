@@ -1,12 +1,12 @@
 This combined script creates a comprehensive directory tree that includes both your personal estate/financial documents and your general archive/project folders, all with realistic file sizes and headers.
-## The Unified "Master Decoy" Script
-Save this as generate_decoy.sh:
+## The Unified "Master" Script
+Save this as generate_master.sh:
 
 #!/bin/bash# Combined VeraCrypt Outer Volume Decoy Generator
 
 TARGET_DIR="$1"if [ -z "$TARGET_DIR" ] || [ ! -d "$TARGET_DIR" ]; then
     echo "Error: Please mount your outer volume and provide the path."
-    echo "Usage: ./generate_decoy.sh /media/veracrypt1"
+    echo "Usage: ./generate_master.sh /media/veracrypt1"
     exit 1fi
 # Define the full folder and file structure
 declare -A STRUCTURE
@@ -56,14 +56,14 @@ echo "✅ Done. Your outer volume now looks like a highly sensitive, legitimate 
 
    1. Make it executable:
    
-   chmod +x generate_decoy.sh
+   chmod +x generate_master.sh
    
    2. Run it:
    
-   ./generate_decoy.sh /path/to/your/mounted/usb
+   ./generate_master.sh /path/to/your/mounted/usb
    
    
 ## One Final Tip for MX Linux Users:
 Since you are on MX Linux, you can verify how this looks to others by using the Thunar file manager. Once the script finishes, the drive should look like a standard collection of "important life documents."
-Do you want to add a section for scanned receipts or medical records to make the "decoy" profile even more realistic?
+Do you want to add a section for scanned receipts or medical records to make the "master" profile even more realistic?
 
