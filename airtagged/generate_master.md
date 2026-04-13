@@ -48,10 +48,11 @@ for DIR in "${!STRUCTURE[@]}"; do
         # This prevents the files from being suspiciously empty
         FILE_SIZE=$(( (RANDOM % 3000) + 150 ))
         head -c "${FILE_SIZE}K" </dev/urandom >> "$FULL_PATH" 2>/dev/null
-    donedone
-````
-echo "✅ Done. Your outer volume now looks like a highly sensitive, legitimate archive."
+    done
+done
 
+echo "✅ Done. Your outer volume now looks like a highly sensitive, legitimate archive."
+````
 ## Quick Setup:
 
    1. Make it executable:
