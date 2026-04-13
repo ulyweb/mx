@@ -82,7 +82,7 @@ echo "✅ SUCCESS: The master decoy setup is complete. Your volume now mimics a 
    
    2. Run it:
 ```bash
-   ./generate_master.sh /path/to/your/mounted/usb
+   ./master_generate_decoy.sh /media/veracrypt1
 ```
    
 ## One Final Tip for MX Linux Users:
