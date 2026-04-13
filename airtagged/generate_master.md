@@ -76,13 +76,14 @@ echo "✅ SUCCESS: The master decoy setup is complete. Your volume now mimics a 
 >## Quick Setup:
 
    1. Make it executable:
-   
+```bash   
    chmod +x generate_master.sh
+```
    
    2. Run it:
-   
+```bash
    ./generate_master.sh /path/to/your/mounted/usb
-   
+```
    
 ## One Final Tip for MX Linux Users:
 Since you are on MX Linux, you can verify how this looks to others by using the Thunar file manager. Once the script finishes, the drive should look like a standard collection of "important life documents."
