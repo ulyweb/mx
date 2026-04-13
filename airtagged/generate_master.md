@@ -75,12 +75,12 @@ echo "✅ SUCCESS: The master decoy setup is complete. Your volume now mimics a 
 >[!TIP]
 >## Quick Setup:
 
->1. Make it executable:
+**1. Make it executable:**
 ```bash   
 chmod +x generate_master.sh
 ```
    
->2. Run it:
+**2. Run it:**
 ```bash
 ./master_generate_decoy.sh /media/veracrypt1
 ```
