@@ -3,7 +3,8 @@
 >Save this as generate_master.sh:
 ---
 ```bash
-#!/bin/bash# Combined VeraCrypt Outer Volume Master Generator
+#!/bin/bash
+# Combined VeraCrypt Outer Volume Master Generator
 
 TARGET_DIR="$1"if [ -z "$TARGET_DIR" ] || [ ! -d "$TARGET_DIR" ]; then
     echo "Error: Please mount your outer volume and provide the path."
@@ -54,7 +55,9 @@ done
 
 echo "✅ Done. Your outer volume now looks like a highly sensitive, legitimate archive."
 ```
-## Quick Setup:
+---
+>[!TIP]
+>## Quick Setup:
 
    1. Make it executable:
    
