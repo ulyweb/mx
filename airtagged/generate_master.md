@@ -1,7 +1,7 @@
 This combined script creates a comprehensive directory tree that includes both your personal estate/financial documents and your general archive/project folders, all with realistic file sizes and headers.
 ## The Unified "Master" Script
 Save this as generate_master.sh:
-
+````bash
 #!/bin/bash# Combined VeraCrypt Outer Volume Master Generator
 
 TARGET_DIR="$1"if [ -z "$TARGET_DIR" ] || [ ! -d "$TARGET_DIR" ]; then
@@ -49,7 +49,7 @@ for DIR in "${!STRUCTURE[@]}"; do
         FILE_SIZE=$(( (RANDOM % 3000) + 150 ))
         head -c "${FILE_SIZE}K" </dev/urandom >> "$FULL_PATH" 2>/dev/null
     donedone
-
+````
 echo "✅ Done. Your outer volume now looks like a highly sensitive, legitimate archive."
 
 ## Quick Setup:
