@@ -1,6 +1,6 @@
 >[!NOTE]
 >## The Unified "Master" Script
->Save this as generate_master.sh:
+>__Save this as generate_master.sh:__
 ---
 ```bash
 #!/bin/bash
