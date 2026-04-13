@@ -1,7 +1,9 @@
 >[!NOTE]
->## The Unified "Master" Script
->__Save this as generate_master.sh:__
+> ## The Unified "Master" Script
+> ___Save this as generate_master.sh:___
+
 ---
+
 ```bash
 #!/bin/bash
 # Master VeraCrypt Outer Volume Decoy Generator (Full Estate & Archive Version)
