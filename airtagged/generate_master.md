@@ -85,7 +85,8 @@ echo "✅ SUCCESS: The master decoy setup is complete. Your volume now mimics a 
    ./master_generate_decoy.sh /media/veracrypt1
 ```
    
-## One Final Tip for MX Linux Users:
-Since you are on MX Linux, you can verify how this looks to others by using the Thunar file manager. Once the script finishes, the drive should look like a standard collection of "important life documents."
-Do you want to add a section for scanned receipts or medical records to make the "master" profile even more realistic?
+>[!Warning]
+> ## One Final Tip for MX Linux Users:
+>>Since you are on MX Linux, you can verify how this looks to others by using the Thunar file manager. Once the script finishes, the drive should look like a standard collection of "important life documents."
+
 
