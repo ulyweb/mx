@@ -778,7 +778,7 @@ sync
 Do not unplug your drive until the sync command finishes and returns you to a clean prompt.
 Would you like to know how to verify the file integrity after the copy to ensure it didn't get corrupted, or are you flashing this .img file to make a bootable USB drive?
 
--
+---
 
 You received that error because your USB drive (128SanDisk) is formatted with a Windows file system like FAT32 or exFAT, which does not support Linux file ownership (chown).
 When you used the -a (archive) flag, you instructed rsync to copy all Linux permissions and owners. Because the USB drive cannot store Linux owner data, the operation was blocked, triggers the "Operation not permitted" error.
@@ -792,7 +792,7 @@ rsync -rtv --progress superbacked-os-amd64-1.10.0.img /media/uly/128SanDisk/
 ````
 ## 🔍 How to verify the file is not corrupted
 Because of the error, you should double-check that the file on the USB matches the original exactly. Run these two commands to compare their unique digital fingerprints:
-``
+```
    1. Check the original file:
    
    md5sum superbacked-os-amd64-1.10.0.img
@@ -800,10 +800,10 @@ Because of the error, you should double-check that the file on the USB matches t
    2. Check the copied file on the USB:
    
    md5sum /media/uly/128SanDisk/superbacked-os-amd64-1.10.0.img
- ``  
+ ```
    
 If the long string of numbers and letters matches perfectly between both outputs, your file is 100% safe and intact.
 Don't forget to type sync in your terminal and press Enter before unplugging your SanDisk drive!
 Are you planning to use this .img file as a virtual machine disk on another computer, or do you need to burn it to a USB to make it bootable?
 
--
+---
