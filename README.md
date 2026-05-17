@@ -751,3 +751,31 @@ flatpak install flathub com.belmoussaoui.Decoder
 sudo virsh net-start default
 sudo virsh net-autostart default
 ````
+
+For a large 11GB .img file, rsync is the better choice because it can show a progress bar and allows you to resume the copy if it gets interrupted.
+While cp is slightly faster because it has less computational overhead, it runs completely silent, leaving you wondering if the terminal froze.
+## 🚀 Recommended Method: rsync
+Use this command to copy your image file safely with a progress tracker:
+````
+rsync -ah --progress filename.img /path/to/destination/
+````
+* -a: Preserves file attributes like permissions and timestamps.
+* -h: Outputs numbers in a human-readable format (GB/MB).
+* --progress: Displays a live progress bar, transfer speed, and estimated time remaining.
+
+## 🏎️ Alternative Method: cp with a Progress Bar
+If you want the raw speed of the cp command but still need to see what is happening, you can pair it with the progress tool or use the advanced -g flag if your system supports it. However, a universal way to see progress with a basic copy structure is using pv (pipe viewer):
+````
+pv filename.img > /path/to/destination/filename.img
+````
+## ⚠️ Crucial Tip for USB Drives
+If you are copying this 11GB .img file to an external USB flash drive or external hard drive, Linux will utilize a write cache. The terminal command might finish and say "100%", but the data is still physically writing in the background.
+Always run this command right after the copy finishes to safely flush the cache:
+```
+sync
+```
+
+Do not unplug your drive until the sync command finishes and returns you to a clean prompt.
+Would you like to know how to verify the file integrity after the copy to ensure it didn't get corrupted, or are you flashing this .img file to make a bootable USB drive?
+
+
