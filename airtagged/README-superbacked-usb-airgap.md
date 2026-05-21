@@ -899,7 +899,7 @@ sudo rsync -avz --progress --checksum ~/Documents/ /mnt/superbacked-data/MasterV
 It's the safest way to move sensitive data into an encrypted vault — you get real-time verification that nothing got corrupted during transfer.
 
 
-**Yes, the AppImage is actually better for your use case.** Good catch.
+**Yes, the AppImage is actually better for your use case.**
 
 Here's why:
 
