@@ -898,4 +898,163 @@ sudo rsync -avz --progress --checksum ~/Documents/ /mnt/superbacked-data/MasterV
 
 It's the safest way to move sensitive data into an encrypted vault — you get real-time verification that nothing got corrupted during transfer.
 
+
+**Yes, the AppImage is actually better for your use case.** Good catch.
+
+Here's why:
+
+---
+
+## AppImage vs Static Binary
+
+| Feature | Static Binary | AppImage |
+|---|---|---|
+| Self-contained | ✅ Yes | ✅ Yes |
+| No installation needed | ✅ Yes | ✅ Yes |
+| GUI included | ✅ Yes | ✅ Yes |
+| Easier to run | ❌ Requires terminal | ✅ Double-click or terminal |
+| Dependencies bundled | ⚠️ Partial | ✅ Complete |
+| Works across different Linux distros | ⚠️ Sometimes | ✅ Yes |
+| Permissions simpler | ❌ May need chmod | ✅ Just double-click |
+
+**The AppImage is essentially a "portable Linux application" — it bundles everything it needs and just works.**
+
+For Superbacked OS specifically:
+- AppImage is more likely to work without needing sudo
+- You can literally double-click it in the file manager
+- Better GUI integration
+
+---
+
+## Updated Setup Using AppImage
+
+### Step 1 — Download the AppImage (from MX Linux)
+
+```bash
+cd ~/Downloads
+wget https://launchpad.net/veracrypt/trunk/1.26.24/+download/VeraCrypt-1.26.24-x86_64.AppImage
+```
+
+---
+
+### Step 2 — Verify the download
+
+```bash
+sha256sum VeraCrypt-1.26.24-x86_64.AppImage
+```
+
+Compare against `https://veracrypt.jp/en/Downloads.html`
+
+---
+
+### Step 3 — Mount sda3 and copy the AppImage
+
+```bash
+sudo mkdir -p /mnt/sda3
+sudo mount /dev/sda3 /mnt/sda3
+
+sudo cp VeraCrypt-1.26.24-x86_64.AppImage /mnt/sda3/
+sudo chmod +x /mnt/sda3/VeraCrypt-1.26.24-x86_64.AppImage
+
+sync
+sudo umount /mnt/sda3
+```
+
+---
+
+## Usage Inside Superbacked OS
+
+### Method 1 — Double-Click in File Manager (Easiest)
+
+1. Boot Superbacked OS
+2. Open file manager
+3. Navigate to `/dev/sda3` or wherever it auto-mounts
+4. Double-click `VeraCrypt-1.26.24-x86_64.AppImage`
+5. VeraCrypt GUI launches
+
+### Method 2 — Terminal
+
+```bash
+/mnt/sda3/VeraCrypt-1.26.24-x86_64.AppImage
+```
+
+---
+
+## Why AppImage Works Better in Superbacked OS
+
+AppImages:
+- Don't require sudo for execution (it's just a containerized binary)
+- Auto-extract to a temp directory and run
+- File manager recognizes them as executable
+- No dependency hell
+- Works even in read-only systems
+
+This is genuinely the better approach than the static binary.
+
+---
+
+## Updated Full Workflow
+
+```bash
+# From MX Linux:
+
+# 1. Download AppImage
+cd ~/Downloads
+wget https://launchpad.net/veracrypt/trunk/1.26.24/+download/VeraCrypt-1.26.24-x86_64.AppImage
+chmod +x VeraCrypt-1.26.24-x86_64.AppImage
+
+# 2. Create partitions (if not done)
+sudo parted /dev/sda mkpart primary 11.3GB 16.3GB
+sudo parted /dev/sda mkpart primary 16.3GB 100%
+sudo partprobe /dev/sda
+
+# 3. Format sda3 as FAT32 (no sudo needed in Superbacked OS)
+sudo mkfs.vfat -n "VeraCryptApp" /dev/sda3
+
+# 4. Mount and copy AppImage
+sudo mkdir -p /mnt/sda3
+sudo mount /dev/sda3 /mnt/sda3
+sudo cp VeraCrypt-1.26.24-x86_64.AppImage /mnt/sda3/
+sudo chmod +x /mnt/sda3/VeraCrypt-1.26.24-x86_64.AppImage
+sync
+sudo umount /mnt/sda3
+
+# 5. Create hidden volume on sda4 using VeraCrypt GUI
+veracrypt  # create hidden volume on /dev/sda4
+```
+
+```bash
+# Inside Superbacked OS:
+
+# 1. Find where sda3 auto-mounted
+lsblk
+# Likely /media/superbacked/VeraCryptApp or similar
+
+# 2. Double-click the AppImage in file manager, OR run from terminal:
+/media/superbacked/VeraCryptApp/VeraCrypt-1.26.24-x86_64.AppImage
+
+# 3. In VeraCrypt GUI:
+# - Select Device: /dev/sda4
+# - Mount
+# - Enter hidden passphrase
+# - Access encrypted data
+```
+
+---
+
+## Should I Update the README with AppImage Instead?
+
+Yes, I think we should. The AppImage approach is:
+- Cleaner
+- More reliable
+- Less likely to hit sudo issues
+- Better integrated with Superbacked OS's desktop
+
+Want me to rewrite both READMEs now with:
+1. **sda3 (5GB FAT32)** — holds VeraCrypt AppImage
+2. **sda4 (~107GB)** — VeraCrypt hidden volume
+3. Complete workflow using the AppImage from Superbacked OS
+
+This is the **correct architecture** from the start.
+
 *Superbacked OS version: 1.10.0 | VeraCrypt version: 1.26.24 | Guide written for MX Linux (Debian 12-based)*
