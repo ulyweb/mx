@@ -632,6 +632,133 @@ sudo cryptsetup close superbacked-data
 Zero extra tools, zero second USB, zero installation — works natively every time.
 
 ---
+Here's the correct way to copy your Documents folder into the encrypted LUKS partition from MX Linux:
 
+---
+
+## Step 1 — Unlock and Mount the LUKS Partition
+
+```bash
+sudo cryptsetup open /dev/sda3 superbacked-data
+sudo mkdir -p /mnt/superbacked-data
+sudo mount /dev/mapper/superbacked-data /mnt/superbacked-data
+```
+
+Enter your LUKS passphrase when prompted.
+
+---
+
+## Step 2 — Create the Target Directory Structure
+
+```bash
+sudo mkdir -p /mnt/superbacked-data/MasterVault/Family/
+```
+
+---
+
+## Step 3 — Copy the Documents Folder
+
+```bash
+sudo cp -rv ~/Documents/* /mnt/superbacked-data/MasterVault/Family/
+```
+
+Breaking this down:
+- `cp` — copy command
+- `-r` — recursive (copy all folders and subfolders)
+- `-v` — verbose (shows what's being copied, so you can see progress)
+- `~/Documents/*` — everything **inside** your Documents folder
+- `/mnt/superbacked-data/MasterVault/Family/` — destination
+
+---
+
+## Step 4 — Verify the Copy Completed Successfully
+
+```bash
+ls -lah /mnt/superbacked-data/MasterVault/Family/
+```
+
+Shows all files and folders that were copied.
+
+Check file counts match:
+
+```bash
+find ~/Documents -type f | wc -l
+find /mnt/superbacked-data/MasterVault/Family -type f | wc -l
+```
+
+Both numbers should be identical.
+
+---
+
+## Step 5 — Sync and Unmount
+
+```bash
+sync
+sudo umount /mnt/superbacked-data
+sudo cryptsetup close superbacked-data
+```
+
+`sync` ensures all data is written to disk before unmounting.
+
+---
+
+## Alternative — If You Want to Preserve the Documents Folder Structure
+
+If you want the `Documents` **folder itself** (not just its contents) copied over:
+
+```bash
+sudo cp -rv ~/Documents /mnt/superbacked-data/MasterVault/Family/
+```
+
+This creates:
+```
+/mnt/superbacked-data/MasterVault/Family/Documents/
+```
+
+instead of:
+```
+/mnt/superbacked-data/MasterVault/Family/[files directly here]
+```
+
+---
+
+## Full Command Sequence (Copy-Paste Ready)
+
+```bash
+# 1. Unlock
+sudo cryptsetup open /dev/sda3 superbacked-data
+
+# 2. Mount
+sudo mkdir -p /mnt/superbacked-data
+sudo mount /dev/mapper/superbacked-data /mnt/superbacked-data
+
+# 3. Create destination
+sudo mkdir -p /mnt/superbacked-data/MasterVault/Family/
+
+# 4. Copy
+sudo cp -rv ~/Documents/* /mnt/superbacked-data/MasterVault/Family/
+
+# 5. Verify
+ls -lah /mnt/superbacked-data/MasterVault/Family/
+
+# 6. Sync and unmount
+sync
+sudo umount /mnt/superbacked-data
+sudo cryptsetup close superbacked-data
+```
+
+---
+
+## Important Notes
+
+- **Use `sudo`** for all mount/unmount/cryptsetup commands — regular user doesn't have permissions
+- **Use `sudo cp`** if any of your Documents files are owned by root, or change ownership first:
+  ```bash
+  sudo chown -R uly:uly /mnt/superbacked-data/MasterVault/Family/
+  ```
+- **Don't unplug the USB** during the copy — wait for all commands to complete
+- Large folder copies may take a few minutes depending on file count and USB speed
+
+Let me know if you hit any errors and paste the output.
 
 *Superbacked OS version: 1.10.0 | VeraCrypt version: 1.26.24 | Guide written for MX Linux (Debian 12-based)*
