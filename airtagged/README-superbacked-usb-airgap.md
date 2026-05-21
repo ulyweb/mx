@@ -759,6 +759,143 @@ sudo cryptsetup close superbacked-data
 - **Don't unplug the USB** during the copy — wait for all commands to complete
 - Large folder copies may take a few minutes depending on file count and USB speed
 
-Let me know if you hit any errors and paste the output.
+### Or you can use rsync
+
+Actually, you **can** use `rsync` — and it's arguably **better** than `cp` for this use case. Here's why and how:
+
+---
+
+## Why rsync is Better Than cp
+
+| Feature | cp | rsync |
+|---|---|---|
+| Resume interrupted transfers | ❌ No | ✅ Yes |
+| Show transfer progress/speed | ❌ No | ✅ Yes |
+| Verify file integrity | ❌ No | ✅ Yes (checksums) |
+| Skip already-copied files | ❌ No | ✅ Yes |
+| Preserve permissions/timestamps | ⚠️ Needs flags | ✅ Default |
+| Handle symlinks properly | ⚠️ Needs flags | ✅ Default |
+
+For copying sensitive data into an encrypted vault, `rsync` is actually the smarter choice because:
+1. You can **see real-time progress**
+2. If interrupted, you can **resume without re-copying everything**
+3. It **verifies checksums** to ensure data integrity
+
+---
+
+## Install rsync (if not already installed)
+
+```bash
+sudo apt install --yes rsync
+```
+
+---
+
+## The Correct rsync Commands
+
+### Option 1 — Copy folder contents (no Documents wrapper)
+
+```bash
+rsync -avz --progress ~/Documents/ /mnt/superbacked-data/MasterVault/Family/
+```
+
+Breaking this down:
+- `-a` — archive mode (preserves permissions, timestamps, ownership)
+- `-v` — verbose (shows what's copying)
+- `-z` — compress during transfer (faster)
+- `--progress` — shows real-time progress for each file and total
+- `~/Documents/` — source with trailing slash (copies **contents**, not the folder itself)
+- `/mnt/superbacked-data/MasterVault/Family/` — destination
+
+---
+
+### Option 2 — Copy the Documents folder itself (with wrapper)
+
+```bash
+rsync -avz --progress ~/Documents /mnt/superbacked-data/MasterVault/Family/
+```
+
+Creates:
+```
+/mnt/superbacked-data/MasterVault/Family/Documents/
+```
+
+instead of files directly in `Family/`
+
+---
+
+### Option 3 — With checksums (paranoid mode — best for sensitive data)
+
+```bash
+rsync -avz --progress --checksum ~/Documents/ /mnt/superbacked-data/MasterVault/Family/
+```
+
+Adds `--checksum` which verifies every file's integrity using MD5 checksums. Slightly slower but guarantees nothing corrupted during transfer.
+
+---
+
+## Full Workflow with rsync
+
+```bash
+# 1. Unlock and mount
+sudo cryptsetup open /dev/sda3 superbacked-data
+sudo mkdir -p /mnt/superbacked-data
+sudo mount /dev/mapper/superbacked-data /mnt/superbacked-data
+
+# 2. Create destination
+sudo mkdir -p /mnt/superbacked-data/MasterVault/Family/
+
+# 3. Copy with rsync (choose one option below)
+
+# Option A — contents only, with checksums (RECOMMENDED for sensitive data)
+sudo rsync -avz --progress --checksum ~/Documents/ /mnt/superbacked-data/MasterVault/Family/
+
+# Option B — contents only, fast mode
+sudo rsync -avz --progress ~/Documents/ /mnt/superbacked-data/MasterVault/Family/
+
+# Option C — with Documents folder wrapper
+sudo rsync -avz --progress ~/Documents /mnt/superbacked-data/MasterVault/Family/
+
+# 4. Verify
+sudo ls -lah /mnt/superbacked-data/MasterVault/Family/
+
+# 5. Fix ownership if needed (optional)
+sudo chown -R uly:uly /mnt/superbacked-data/MasterVault/Family/
+
+# 6. Sync and unmount
+sync
+sudo umount /mnt/superbacked-data
+sudo cryptsetup close superbacked-data
+```
+
+---
+
+## If Transfer Gets Interrupted
+
+The beauty of `rsync` is you can **resume** without starting over:
+
+```bash
+# Just re-run the same command
+sudo rsync -avz --progress --checksum ~/Documents/ /mnt/superbacked-data/MasterVault/Family/
+```
+
+It will:
+1. Skip files that already copied completely
+2. Resume partial files
+3. Only transfer what's missing
+
+Try that with `cp` — you'd have to delete everything and start over.
+
+---
+
+## My Recommendation
+
+Use **Option A** (with checksums):
+
+```bash
+sudo rsync -avz --progress --checksum ~/Documents/ /mnt/superbacked-data/MasterVault/Family/
+```
+
+It's the safest way to move sensitive data into an encrypted vault — you get real-time verification that nothing got corrupted during transfer.
 
 *Superbacked OS version: 1.10.0 | VeraCrypt version: 1.26.24 | Guide written for MX Linux (Debian 12-based)*
