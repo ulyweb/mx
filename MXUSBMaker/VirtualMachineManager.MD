@@ -561,3 +561,60 @@ So now you have:
 - All of it running on **native Linux virtualization**  
 
 ---
+
+
+To share files between your MX Linux host and a VM simultaneously, we need to clear up a very common misconception about how virtual disks work.
+
+You **cannot** use a virtual disk volume (qcow2 or raw) to share files between the host and guest at the same time. If you mount a standard virtual disk on both systems concurrently, they will overwrite each other's data and instantly corrupt the filesystem.
+
+Here is how you actually divide these tasks:
+
+* **For the VM's Operating System:** Use **qcow2**. It is the standard for KVM/QEMU because it supports snapshots, dynamic resizing (thin provisioning), and compression. raw is slightly faster, but you lose all of those management features.
+* **For the Shared Storage:** Use a **Filesystem Passthrough** using a driver called **virtiofs**. This allows the VM to directly read and write to a standard folder on your MX Linux host in real-time, safely.
+
+Here is the proper way to set up simultaneous sharing using virtiofs in Virtual Machine Manager.
+
+1. **Create the shared folder on MX Linux:** Host machine preparation.
+Open your terminal and create the directory you want to share, and ensure it has open permissions so the hypervisor can access it.
+
+```bash
+mkdir ~/vm_share
+chmod 777 ~/vm_share
+
+```
+    *(Note: 777 is used here for simplicity so the libvirt-qemu user can easily write to it. You can lock down permissions later using ACLs if needed).*
+  </Step>
+  <Step subtitle="VM must be powered off" title="Enable Shared Memory in Virt-Manager">
+    virtiofs requires the VM to use shared memory to pass the files back and forth rapidly.
+    
+    1. Open Virtual Machine Manager and click on your VM.
+    2. Click the **Lightbulb icon** (Show virtual hardware details).
+    3. Click on **Memory** in the left pane.
+    4. Check the box for **Enable shared memory**.
+    5. Click **Apply**.
+  </Step>
+  <Step title="Add the Filesystem Hardware">
+    1. Still in the hardware details screen, click **Add Hardware** at the bottom left.
+    2. Select **Filesystem** from the list.
+    3. Set **Driver** to virtiofs.
+    4. Set **Source path** to the folder you created on the host (e.g., /home/username/vm_share).
+    5. Set **Target path** to a tag name. This is *not* a directory path; it's a label the guest will look for. Name it something simple like share_tag.
+    6. Click **Finish**.
+  </Step>
+  <Step subtitle="Assuming a Linux guest OS" title="Start the VM and Mount the Share">
+    Power on your VM and open its terminal. You will mount the tag you created in the previous step to a folder inside the guest.
+    
+    
+
+
+```bash
+    # Create a mount point inside the guest
+    sudo mkdir /mnt/host_share
+
+    # Mount the virtiofs tag to that folder
+    sudo mount -t virtiofs share_tag /mnt/host_share
+
+```
+
+
+Any file you drop into /home/username/vm_share on your MX Linux host will now instantly appear in /mnt/host_share on your guest VM, with both systems able to read and write safely.
