@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Superbacked OS — Control Center</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;900&display=swap');
+
+:root {
+  --bg:      #050810;
+  --bg2:     #0a0f1e;
+  --bg3:     #0f1628;
+  --border:  #1a2540;
+  --border2: #243055;
+  --accent:  #00d4ff;
+  --accent2: #0088cc;
+  --green:   #00ff88;
+  --green2:  #00cc66;
+  --yellow:  #ffcc00;
+  --red:     #ff4455;
+  --purple:  #aa55ff;
+  --orange:  #ff8800;
+  --text:    #c8d8f0;
+  --text2:   #7090b0;
+  --text3:   #405070;
+  --mono:    'Share Tech Mono', monospace;
+  --sans:    'Exo 2', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none; z-index: 0;
+}
+
+/* HEADER */
+header {
+  position: relative; z-index: 10;
+  padding: 28px 36px 24px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(0,212,255,0.06) 0%, transparent 100%);
+  display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap; gap: 16px;
+}
+.header-left { display: flex; align-items: center; gap: 20px; }
+.logo-mark {
+  width: 54px; height: 54px;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; flex-shrink: 0;
+  animation: pulse-logo 3s ease-in-out infinite;
+}
+@keyframes pulse-logo {
+  0%,100% { filter: drop-shadow(0 0 8px var(--accent)); }
+  50%      { filter: drop-shadow(0 0 22px var(--accent)); }
+}
+.header-title h1 { font-size: 22px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); }
+.header-title p  { font-size: 13px; color: var(--text2); letter-spacing: 2px; margin-top: 3px; }
+.header-status { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 13px; color: var(--green); }
+.status-dot { width: 10px; height: 10px; background: var(--green); border-radius: 50%; animation: blink 2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* NAV */
+nav {
+  position: relative; z-index: 10;
+  padding: 0 36px;
+  border-bottom: 1px solid var(--border);
+  display: flex; gap: 0; overflow-x: auto;
+}
+.tab {
+  padding: 18px 28px;
+  font-family: var(--sans); font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--text2);
+  cursor: pointer; border: none; background: none;
+  border-bottom: 3px solid transparent; white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab .tab-num {
+  display: inline-block; background: var(--bg3);
+  border: 1px solid var(--border2); border-radius: 10px;
+  padding: 2px 8px; font-size: 11px; font-family: var(--mono);
+  margin-right: 8px; color: var(--text2);
+}
+.tab.active .tab-num { border-color: var(--accent); color: var(--accent); }
+
+/* MAIN */
+main { position: relative; z-index: 10; padding: 36px; max-width: 1400px; margin: 0 auto; }
+.panel { display: none; }
+.panel.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+
+/* SECTION HEADER */
+.section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+.section-header h2 { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+.section-header p  { font-size: 14px; color: var(--text2); margin-top: 3px; }
+.section-icon {
+  width: 48px; height: 48px; border-radius: 10px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+
+/* CARDS */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 16px; margin-bottom: 28px; }
+.card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.card-title { font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text2); margin-bottom: 10px; }
+.card-value { font-family: var(--mono); font-size: 24px; color: var(--accent); }
+.card-sub   { font-size: 12px; color: var(--text3); margin-top: 6px; }
+
+/* CONFIG FORM */
+.config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 24px; }
+@media(max-width:700px){ .config-grid{ grid-template-columns:1fr; } }
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field label { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text2); }
+.field .hint { font-size: 12px; color: var(--text3); margin-top: -4px; }
+.field input, .field select {
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 12px 16px;
+  font-family: var(--mono); font-size: 14px; color: var(--text);
+  outline: none; transition: border-color 0.2s;
+}
+.field input:focus, .field select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,212,255,0.1); }
+.field.full { grid-column: 1/-1; }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 28px; border-radius: 8px;
+  font-family: var(--sans); font-size: 14px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; border: none; transition: all 0.2s;
+}
+.btn-primary { background: linear-gradient(135deg,var(--accent2),var(--accent)); color:#000; }
+.btn-primary:hover { filter:brightness(1.15); transform:translateY(-2px); }
+.btn-primary:disabled { filter:grayscale(1); opacity:0.5; cursor:not-allowed; transform:none; }
+.btn-success { background: linear-gradient(135deg,var(--green2),var(--green)); color:#000; }
+.btn-success:hover { filter:brightness(1.1); transform:translateY(-2px); }
+.btn-success:disabled { filter:grayscale(1); opacity:0.5; cursor:not-allowed; transform:none; }
+.btn-danger  { background: linear-gradient(135deg,#cc2233,var(--red)); color:#fff; }
+.btn-danger:hover  { filter:brightness(1.1); transform:translateY(-2px); }
+.btn-warn    { background: linear-gradient(135deg,#cc8800,var(--yellow)); color:#000; }
+.btn-warn:hover    { filter:brightness(1.1); transform:translateY(-2px); }
+.btn-purple  { background: linear-gradient(135deg,#7733cc,var(--purple)); color:#fff; }
+.btn-purple:hover  { filter:brightness(1.1); transform:translateY(-2px); }
+.btn-ghost   { background:var(--bg3); border:1px solid var(--border2); color:var(--text2); }
+.btn-ghost:hover   { border-color:var(--accent); color:var(--accent); }
+.btn-row { display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; }
+
+/* TERMINAL */
+.terminal-wrap { background:#020408; border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-top:22px; }
+.terminal-bar  {
+  background: var(--bg3); border-bottom:1px solid var(--border);
+  padding:12px 18px; display:flex; align-items:center; justify-content:space-between;
+}
+.terminal-bar-left { display:flex; align-items:center; gap:8px; }
+.term-dot { width:12px; height:12px; border-radius:50%; }
+.term-title { font-family:var(--mono); font-size:12px; color:var(--text2); margin-left:8px; }
+.terminal-output {
+  font-family:var(--mono); font-size:13px; line-height:1.8;
+  padding:22px; height:420px; overflow-y:auto;
+  white-space:pre-wrap; word-break:break-all; color:#88aabb;
+}
+.terminal-output::-webkit-scrollbar { width:6px; }
+.terminal-output::-webkit-scrollbar-track { background:transparent; }
+.terminal-output::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+.t-green{color:#00ff88}.t-yellow{color:#ffcc00}.t-red{color:#ff4455}
+.t-blue{color:#44aaff}.t-cyan{color:#00d4ff}.t-dim{color:#405070}
+.t-white{color:#c8d8f0}.t-purple{color:#aa55ff}.t-orange{color:#ff8800}
+
+/* PROGRESS */
+.progress-section { margin-top:22px; }
+.progress-label { display:flex; justify-content:space-between; font-size:12px; margin-bottom:8px; color:var(--text2); font-family:var(--mono); }
+.progress-bar-wrap { background:var(--bg3); border-radius:4px; height:8px; overflow:hidden; border:1px solid var(--border); }
+.progress-bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--accent2),var(--accent)); transition:width 0.4s ease; box-shadow:0 0 8px var(--accent); width:0%; }
+
+/* WORKFLOW */
+.workflow { display:flex; align-items:flex-start; gap:0; margin:28px 0; overflow-x:auto; padding-bottom:8px; }
+.wf-step  { display:flex; flex-direction:column; align-items:center; min-width:150px; }
+.wf-box   { width:120px; padding:16px 12px; background:var(--bg2); border:1px solid var(--border); border-radius:12px; text-align:center; transition:border-color 0.3s; }
+.wf-box.active-wf { border-color:var(--accent); box-shadow:0 0 16px rgba(0,212,255,0.15); }
+.wf-box.done-wf   { border-color:var(--green);  box-shadow:0 0 16px rgba(0,255,136,0.1); }
+.wf-num   { font-family:var(--mono); font-size:24px; color:var(--text3); }
+.wf-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--text2); margin-top:8px; line-height:1.4; }
+.wf-arrow { flex:1; display:flex; align-items:center; padding-top:26px; min-width:30px; }
+.wf-arrow::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border2),var(--border)); }
+
+/* ALERTS */
+.alert { padding:16px 20px; border-radius:10px; font-size:14px; margin-bottom:18px; display:flex; gap:12px; align-items:flex-start; line-height:1.6; }
+.alert-warn    { background:rgba(255,204,0,0.08); border:1px solid rgba(255,204,0,0.3);    color:var(--yellow); }
+.alert-info    { background:rgba(0,212,255,0.06); border:1px solid rgba(0,212,255,0.25);   color:var(--accent); }
+.alert-success { background:rgba(0,255,136,0.06); border:1px solid rgba(0,255,136,0.25);   color:var(--green);  }
+.alert-danger  { background:rgba(255,68,85,0.08); border:1px solid rgba(255,68,85,0.3);    color:var(--red);    }
+
+/* INSTRUCTION BLOCKS */
+.instruction-block { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:26px; margin-bottom:18px; }
+.instruction-block h3 { font-size:15px; font-weight:700; color:var(--accent); letter-spacing:1px; margin-bottom:16px; text-transform:uppercase; }
+.instruction-block ol, .instruction-block ul { padding-left:22px; display:flex; flex-direction:column; gap:12px; }
+.instruction-block li { font-size:14px; color:var(--text); line-height:1.7; }
+.instruction-block li strong { color:var(--yellow); }
+.instruction-block li code { font-family:var(--mono); font-size:13px; background:var(--bg3); border:1px solid var(--border2); border-radius:4px; padding:2px 8px; color:var(--accent); }
+
+/* DIVIDER */
+.divider { height:1px; background:var(--border); margin:32px 0; }
+
+/* EXECUTE PANEL */
+.exec-card {
+  background: var(--bg2); border:1px solid var(--border);
+  border-radius:12px; padding:24px; margin-bottom:16px;
+}
+.exec-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:12px; }
+.exec-card-title  { font-size:16px; font-weight:700; color:var(--text); }
+.exec-card-desc   { font-size:13px; color:var(--text2); margin-top:4px; }
+.exec-status {
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:var(--mono); font-size:12px; padding:6px 14px;
+  border-radius:20px; border:1px solid var(--border2); background:var(--bg3); color:var(--text2);
+}
+.exec-status.running { border-color:var(--accent); color:var(--accent); }
+.exec-status.done    { border-color:var(--green);  color:var(--green);  }
+.exec-status.error   { border-color:var(--red);    color:var(--red);    }
+
+/* VIRTIOFS */
+.vfs-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0; }
+@media(max-width:700px){ .vfs-grid{ grid-template-columns:1fr; } }
+
+/* FOOTER */
+footer {
+  position:relative; z-index:10;
+  padding:18px 36px; border-top:1px solid var(--border);
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+}
+footer span { font-family:var(--mono); font-size:12px; color:var(--text3); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="logo-mark">🔐</div>
+    <div class="header-title">
+      <h1>Superbacked OS Control Center</h1>
+      <p>MX Linux · sysVinit · Custom Live OS Builder v2.2.0</p>
+    </div>
+  </div>
+  <div class="header-status">
+    <div class="status-dot"></div>
+    <span id="clock">--:--:--</span>
+    &nbsp;|&nbsp;
+    <span>READY</span>
+  </div>
+</header>
+
+<nav>
+  <button class="tab active" onclick="showTab('dashboard')"><span class="tab-num">01</span>Dashboard</button>
+  <button class="tab"        onclick="showTab('build')"    ><span class="tab-num">02</span>Build OS</button>
+  <button class="tab"        onclick="showTab('snapshot')" ><span class="tab-num">03</span>Pre-Snapshot</button>
+  <button class="tab"        onclick="showTab('nuke')"     ><span class="tab-num">04</span>Nuke MX Icons</button>
+  <button class="tab"        onclick="showTab('flash')"    ><span class="tab-num">05</span>Flash USB</button>
+  <button class="tab"        onclick="showTab('virtiofs')" ><span class="tab-num">06</span>virtiofs Share</button>
+  <button class="tab"        onclick="showTab('howto')"    ><span class="tab-num">07</span>How To</button>
+</nav>
+
+<main>
+
+<!-- ════════════════════════════════
+     01 — DASHBOARD
+════════════════════════════════ -->
+<div class="panel active" id="panel-dashboard">
+  <div class="section-header">
+    <div class="section-icon">📊</div>
+    <div><h2>Mission Control</h2><p>Complete workflow — start here every time</p></div>
+  </div>
+
+  <div class="workflow">
+    <div class="wf-step"><div class="wf-box" id="wf1"><div class="wf-num">01</div><div class="wf-label">Customize Desktop</div></div></div>
+    <div class="wf-arrow"></div>
+    <div class="wf-step"><div class="wf-box" id="wf2"><div class="wf-num">02</div><div class="wf-label">Build OS Script</div></div></div>
+    <div class="wf-arrow"></div>
+    <div class="wf-step"><div class="wf-box" id="wf3"><div class="wf-num">03</div><div class="wf-label">Nuke MX Icons</div></div></div>
+    <div class="wf-arrow"></div>
+    <div class="wf-step"><div class="wf-box" id="wf4"><div class="wf-num">04</div><div class="wf-label">Pre-Snapshot Cleanup</div></div></div>
+    <div class="wf-arrow"></div>
+    <div class="wf-step"><div class="wf-box" id="wf5"><div class="wf-num">05</div><div class="wf-label">MX Snapshot ISO</div></div></div>
+    <div class="wf-arrow"></div>
+    <div class="wf-step"><div class="wf-box" id="wf6"><div class="wf-num">06</div><div class="wf-label">Flash USB</div></div></div>
+  </div>
+
+  <div class="cards">
+    <div class="card"><div class="card-title">Logged In As</div><div class="card-value">uly</div><div class="card-sub">Build machine — correct account ✓</div></div>
+    <div class="card"><div class="card-title">Target User</div><div class="card-value">superbacked</div><div class="card-sub">Limited live OS user — no sudo</div></div>
+    <div class="card"><div class="card-title">Init System</div><div class="card-value">sysVinit</div><div class="card-sub">MX Linux default — no systemd</div></div>
+    <div class="card"><div class="card-title">Dashboard Version</div><div class="card-value">v2.2.0</div><div class="card-sub">Includes nuke + virtiofs + execute</div></div>
+  </div>
+
+  <div class="alert alert-warn">⚠ &nbsp;<span><strong>All scripts must run as root.</strong> Open terminal → type <code>su -</code> → enter root password. Then run the downloaded script.</span></div>
+  <div class="alert alert-info">ℹ &nbsp;<span><strong>New build:</strong> Tab 02 → Build OS. &nbsp;|&nbsp; <strong>Icons still showing:</strong> Tab 04 → Nuke MX Icons. &nbsp;|&nbsp; <strong>Ready to snapshot:</strong> Tab 03 → Pre-Snapshot.</span></div>
+
+  <div class="divider"></div>
+  <div class="section-header"><div class="section-icon">⚡</div><div><h2>Quick Launch</h2><p>Jump to any section instantly</p></div></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="showTab('build')">🔨 &nbsp;Build OS</button>
+    <button class="btn btn-danger"  onclick="showTab('nuke')">💣 &nbsp;Nuke MX Icons</button>
+    <button class="btn btn-success" onclick="showTab('snapshot')">🧹 &nbsp;Pre-Snapshot</button>
+    <button class="btn btn-ghost"   onclick="showTab('flash')">💾 &nbsp;Flash USB</button>
+    <button class="btn btn-purple"  onclick="showTab('virtiofs')">📂 &nbsp;virtiofs Share</button>
+    <button class="btn btn-ghost"   onclick="showTab('howto')">📖 &nbsp;How To</button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     02 — BUILD OS
+════════════════════════════════ -->
+<div class="panel" id="panel-build">
+  <div class="section-header"><div class="section-icon">🔨</div><div><h2>Build Custom OS</h2><p>Configure and generate the full automated OS builder — 19 phases</p></div></div>
+  <div class="alert alert-warn">⚠ &nbsp;<span><strong>Run on your build machine only.</strong> Log in as <code>uly</code>, open terminal, run <code>su -</code>, then generate + run the script.</span></div>
+
+  <div class="config-grid">
+    <div class="field">
+      <label>Root Password <span style="color:var(--red)">*</span></label>
+      <input type="password" id="cfg-root-pw" placeholder="Your secret root password">
+      <span class="hint">⚠ Required — only admin access on live OS</span>
+    </div>
+    <div class="field">
+      <label>Default User Password</label>
+      <input type="text" id="cfg-user-pw" value="superbacked">
+      <span class="hint">Password for the 'superbacked' limited user</span>
+    </div>
+    <div class="field">
+      <label>VeraCrypt SHA256 <span style="color:var(--red)">*</span></label>
+      <input type="text" id="cfg-vc-sha" placeholder="Paste from veracrypt.jp/en/Downloads.html">
+      <span class="hint">Official checksum for VeraCrypt-1.26.24-x86_64.AppImage</span>
+    </div>
+    <div class="field">
+      <label>Superbacked AppImage Path</label>
+      <input type="text" id="cfg-sb-path" placeholder="/home/uly/Downloads/Superbacked.AppImage">
+      <span class="hint">Leave blank if not downloaded yet</span>
+    </div>
+    <div class="field full">
+      <label>ISO Output Directory</label>
+      <input type="text" id="cfg-iso-dir" value="/home/uly/CustomOS-ISO">
+      <span class="hint">Where the final ISO snapshot will be saved</span>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="generateBuildScript()">⚙ Generate Script</button>
+    <button class="btn btn-success" id="btn-copy-build"  style="display:none" onclick="copyScript('build')">📋 Copy</button>
+    <button class="btn btn-ghost"   id="btn-dl-build"    style="display:none" onclick="downloadScript('build','build-custom-superbacked-os.sh')">⬇ Download</button>
+  </div>
+
+  <div class="terminal-wrap" id="build-terminal" style="display:none">
+    <div class="terminal-bar">
+      <div class="terminal-bar-left">
+        <div class="term-dot" style="background:#ff5f57"></div>
+        <div class="term-dot" style="background:#febc2e"></div>
+        <div class="term-dot" style="background:#28c840"></div>
+        <span class="term-title">build-custom-superbacked-os.sh</span>
+      </div>
+      <button class="btn btn-ghost" style="padding:6px 14px;font-size:12px" onclick="clearTerm('build-term-out')">Clear</button>
+    </div>
+    <div class="terminal-output" id="build-term-out"></div>
+  </div>
+  <div class="progress-section" id="build-progress" style="display:none">
+    <div class="progress-label"><span id="build-prog-label">Generating...</span><span id="build-prog-pct">0%</span></div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="build-prog-fill"></div></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     03 — PRE-SNAPSHOT
+════════════════════════════════ -->
+<div class="panel" id="panel-snapshot">
+  <div class="section-header"><div class="section-icon">🧹</div><div><h2>Pre-Snapshot Cleanup</h2><p>Run after desktop customization — before mx-snapshot. Includes nuke, KDE session fix, cache clear, verification.</p></div></div>
+
+  <div class="alert alert-warn">⚠ &nbsp;<span><strong>Close ALL open windows first.</strong> The desktop must be completely clean before running this.</span></div>
+  <div class="alert alert-success">✅ &nbsp;<span>This script automatically removes default MX icons, fixes KDE session, clears all caches/logs/history, verifies all sysVinit services, then launches mx-snapshot.</span></div>
+
+  <div class="instruction-block">
+    <h3>✅ Pre-Flight Checklist</h3>
+    <ol>
+      <li>Finish all desktop customization — icons, wallpaper, theme, taskbar.</li>
+      <li><strong>Close ALL open windows</strong> — file manager, browser, every app.</li>
+      <li>Do NOT reboot — run in the same session after customizing.</li>
+      <li>Open terminal → type <code>su -</code> → enter root password.</li>
+      <li>Generate and download the script below, then run it.</li>
+    </ol>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-success" onclick="generateSnapshotScript()">⚙ Generate Script</button>
+    <button class="btn btn-ghost"   id="btn-copy-snap" style="display:none" onclick="copyScript('snap')">📋 Copy</button>
+    <button class="btn btn-ghost"   id="btn-dl-snap"   style="display:none" onclick="downloadScript('snap','pre-snapshot-cleanup.sh')">⬇ Download</button>
+  </div>
+
+  <div class="terminal-wrap" id="snap-terminal" style="display:none">
+    <div class="terminal-bar">
+      <div class="terminal-bar-left">
+        <div class="term-dot" style="background:#ff5f57"></div>
+        <div class="term-dot" style="background:#febc2e"></div>
+        <div class="term-dot" style="background:#28c840"></div>
+        <span class="term-title">pre-snapshot-cleanup.sh</span>
+      </div>
+      <button class="btn btn-ghost" style="padding:6px 14px;font-size:12px" onclick="clearTerm('snap-term-out')">Clear</button>
+    </div>
+    <div class="terminal-output" id="snap-term-out"></div>
+  </div>
+  <div class="progress-section" id="snap-progress" style="display:none">
+    <div class="progress-label"><span id="snap-prog-label">Generating...</span><span id="snap-prog-pct">0%</span></div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="snap-prog-fill"></div></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     04 — NUKE MX ICONS
+════════════════════════════════ -->
+<div class="panel" id="panel-nuke">
+  <div class="section-header"><div class="section-icon">💣</div><div><h2>Nuke MX Icons</h2><p>Permanently destroys ALL default MX Linux icons from every possible location — 5 pass nuclear removal</p></div></div>
+
+  <div class="alert alert-danger">🚨 &nbsp;<span><strong>Use this when default MX icons keep coming back</strong> after normal cleanup. This does a full filesystem deep scan and removes by filename AND file content.</span></div>
+
+  <div class="cards">
+    <div class="card"><div class="card-title">Pass 1</div><div class="card-value" style="font-size:16px;color:var(--yellow)">Known Dirs</div><div class="card-sub">9 specific locations including aufs-ram overlay</div></div>
+    <div class="card"><div class="card-title">Pass 2</div><div class="card-value" style="font-size:16px;color:var(--yellow)">Filename Scan</div><div class="card-sub">Full filesystem find by filename pattern</div></div>
+    <div class="card"><div class="card-title">Pass 3</div><div class="card-value" style="font-size:16px;color:var(--red)">Content Scan</div><div class="card-sub">Reads every .desktop file looking for Name= MX fields</div></div>
+    <div class="card"><div class="card-title">Pass 4</div><div class="card-value" style="font-size:16px;color:var(--green)">Fix Trust</div><div class="card-sub">Fixes permissions and KDE trust flags on remaining icons</div></div>
+    <div class="card"><div class="card-title">Pass 5</div><div class="card-value" style="font-size:16px;color:var(--green)">Clear Cache</div><div class="card-sub">Wipes KDE icon cache so changes show immediately</div></div>
+  </div>
+
+  <div class="instruction-block">
+    <h3>Icons Targeted for Removal</h3>
+    <ul>
+      <li><strong>MX User Manual</strong> — FAQ.desktop, MX-User_Manual.desktop, mx-user.desktop and variants</li>
+      <li><strong>Installer</strong> — Installer.desktop, mx-installer.desktop and variants</li>
+      <li><strong>Quick System Info</strong> — quick-system-info.desktop and variants</li>
+      <li><strong>MX Fluxbox Manual</strong> — MX-Fluxbox_Manual.desktop</li>
+      <li><strong>Also found by content</strong> — any .desktop file where Name= matches these strings</li>
+    </ul>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-danger" onclick="generateNukeScript()">💣 Generate Nuke Script</button>
+    <button class="btn btn-ghost"  id="btn-copy-nuke" style="display:none" onclick="copyScript('nuke')">📋 Copy</button>
+    <button class="btn btn-ghost"  id="btn-dl-nuke"   style="display:none" onclick="downloadScript('nuke','nuke-mx-icons.sh')">⬇ Download</button>
+  </div>
+
+  <div class="terminal-wrap" id="nuke-terminal" style="display:none">
+    <div class="terminal-bar">
+      <div class="terminal-bar-left">
+        <div class="term-dot" style="background:#ff5f57"></div>
+        <div class="term-dot" style="background:#febc2e"></div>
+        <div class="term-dot" style="background:#28c840"></div>
+        <span class="term-title">nuke-mx-icons.sh — 5 Pass Nuclear Removal</span>
+      </div>
+      <button class="btn btn-ghost" style="padding:6px 14px;font-size:12px" onclick="clearTerm('nuke-term-out')">Clear</button>
+    </div>
+    <div class="terminal-output" id="nuke-term-out"></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     05 — FLASH USB
+════════════════════════════════ -->
+<div class="panel" id="panel-flash">
+  <div class="section-header"><div class="section-icon">💾</div><div><h2>Flash ISO to USB</h2><p>Write the snapshot ISO to your USB thumb drive with verification</p></div></div>
+
+  <div class="alert alert-danger">🚨 &nbsp;<span><strong>This permanently overwrites the USB.</strong> Double-check your device. Your internal NVMe (nvme0n1) will NOT be touched.</span></div>
+
+  <div class="instruction-block">
+    <h3>How to Find Your USB Device Name</h3>
+    <ol>
+      <li>Open terminal and run <code>lsblk</code></li>
+      <li>Find the drive that matches your USB size and has <strong>RM=1</strong> (removable)</li>
+      <li>Your internal drive is <strong>nvme0n1</strong> — never use that</li>
+      <li>USB is usually <strong>/dev/sda</strong> or <strong>/dev/sdb</strong></li>
+      <li>Enter just the device — <code>/dev/sda</code> not <code>/dev/sda1</code></li>
+    </ol>
+  </div>
+
+  <div class="config-grid">
+    <div class="field">
+      <label>ISO File Path</label>
+      <input type="text" id="flash-iso-path" placeholder="/home/uly/CustomOS-ISO/snapshot.iso">
+      <span class="hint">Full path to .iso file from mx-snapshot</span>
+    </div>
+    <div class="field">
+      <label>USB Device</label>
+      <input type="text" id="flash-usb-dev" placeholder="/dev/sda">
+      <span class="hint">Run lsblk to confirm — use whole device not partition</span>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="generateFlashScript()">⚙ Generate Flash Script</button>
+    <button class="btn btn-ghost"   id="btn-copy-flash" style="display:none" onclick="copyScript('flash')">📋 Copy</button>
+    <button class="btn btn-ghost"   id="btn-dl-flash"   style="display:none" onclick="downloadScript('flash','flash-usb.sh')">⬇ Download</button>
+  </div>
+
+  <div class="terminal-wrap" id="flash-terminal" style="display:none">
+    <div class="terminal-bar">
+      <div class="terminal-bar-left">
+        <div class="term-dot" style="background:#ff5f57"></div>
+        <div class="term-dot" style="background:#febc2e"></div>
+        <div class="term-dot" style="background:#28c840"></div>
+        <span class="term-title">flash-usb.sh</span>
+      </div>
+    </div>
+    <div class="terminal-output" id="flash-term-out"></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     06 — VIRTIOFS
+════════════════════════════════ -->
+<div class="panel" id="panel-virtiofs">
+  <div class="section-header"><div class="section-icon">📂</div><div><h2>virtiofs Shared Folder</h2><p>Real-time folder sharing between MX Linux host and VM using virtiofs passthrough</p></div></div>
+
+  <div class="alert alert-info">ℹ &nbsp;<span><strong>What virtiofs does:</strong> Lets your VM read and write to a folder on your MX Linux host in real-time. Files you drop into the host folder instantly appear inside the VM. No network, no copying — direct filesystem passthrough.</span></div>
+
+  <div class="config-grid">
+    <div class="field">
+      <label>Host Shared Folder Path</label>
+      <input type="text" id="vfs-host-path" value="/home/uly/vm_share" placeholder="/home/uly/vm_share">
+      <span class="hint">Folder on your MX Linux host to share with VM</span>
+    </div>
+    <div class="field">
+      <label>Share Tag Name</label>
+      <input type="text" id="vfs-tag" value="share_tag" placeholder="share_tag">
+      <span class="hint">Label the VM uses to find the share — keep it simple, no spaces</span>
+    </div>
+    <div class="field">
+      <label>Guest Mount Point</label>
+      <input type="text" id="vfs-guest-mount" value="/mnt/host_share" placeholder="/mnt/host_share">
+      <span class="hint">Directory inside the VM where the share will appear</span>
+    </div>
+    <div class="field">
+      <label>VM Name (in virt-manager)</label>
+      <input type="text" id="vfs-vm-name" placeholder="e.g. superbacked-os or MX-Superbacked">
+      <span class="hint">Exact VM name shown in Virtual Machine Manager</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-header"><div class="section-icon">🖥</div><div><h2>Step-by-Step Setup</h2><p>Follow these in order — VM must be powered OFF before steps 2–4</p></div></div>
+
+  <div class="instruction-block">
+    <h3>Step 1 — Create the Shared Folder on Your MX Linux Host</h3>
+    <ol>
+      <li>This creates the folder that will be shared with the VM.</li>
+      <li>Generate the script below and run it as root — it creates the folder with correct permissions for libvirt-qemu to access it.</li>
+      <li>The <strong>777 permission</strong> is for simplicity. You can tighten it with ACLs later if needed.</li>
+    </ol>
+  </div>
+
+  <div class="instruction-block">
+    <h3>Step 2 — Enable Shared Memory in virt-manager (VM must be OFF)</h3>
+    <ol>
+      <li>Open <strong>Virtual Machine Manager</strong></li>
+      <li>Click on your VM — <strong>do not start it yet</strong></li>
+      <li>Click the <strong>Lightbulb icon</strong> (Show virtual hardware details)</li>
+      <li>Click <strong>Memory</strong> in the left panel</li>
+      <li>Check the box: <strong>Enable shared memory</strong></li>
+      <li>Click <strong>Apply</strong></li>
+    </ol>
+  </div>
+
+  <div class="instruction-block">
+    <h3>Step 3 — Add the virtiofs Filesystem Hardware (VM must be OFF)</h3>
+    <ol>
+      <li>Still in the VM hardware details screen</li>
+      <li>Click <strong>Add Hardware</strong> at the bottom left</li>
+      <li>Select <strong>Filesystem</strong> from the list</li>
+      <li>Set <strong>Driver</strong> to <code>virtiofs</code></li>
+      <li>Set <strong>Source path</strong> to your host folder — e.g. <code id="vfs-show-host">/home/uly/vm_share</code></li>
+      <li>Set <strong>Target path</strong> to the tag name — e.g. <code id="vfs-show-tag">share_tag</code> (this is a label, not a real path)</li>
+      <li>Click <strong>Finish</strong></li>
+    </ol>
+  </div>
+
+  <div class="instruction-block">
+    <h3>Step 4 — Start the VM and Mount the Share Inside It</h3>
+    <ol>
+      <li>Power on the VM</li>
+      <li>Open a terminal inside the VM</li>
+      <li>The mount command uses the tag name you set — the script below generates the exact command.</li>
+      <li>For auto-mount on every boot, add it to <code>/etc/fstab</code> inside the VM — the script handles this too.</li>
+    </ol>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="btn-row">
+    <button class="btn btn-purple" onclick="generateVirtiofsScript()">⚙ Generate virtiofs Setup Script</button>
+    <button class="btn btn-ghost"  id="btn-copy-vfs" style="display:none" onclick="copyScript('vfs')">📋 Copy</button>
+    <button class="btn btn-ghost"  id="btn-dl-vfs"   style="display:none" onclick="downloadScript('vfs','setup-virtiofs.sh')">⬇ Download</button>
+  </div>
+
+  <div class="terminal-wrap" id="vfs-terminal" style="display:none">
+    <div class="terminal-bar">
+      <div class="terminal-bar-left">
+        <div class="term-dot" style="background:#ff5f57"></div>
+        <div class="term-dot" style="background:#febc2e"></div>
+        <div class="term-dot" style="background:#28c840"></div>
+        <span class="term-title">setup-virtiofs.sh</span>
+      </div>
+      <button class="btn btn-ghost" style="padding:6px 14px;font-size:12px" onclick="clearTerm('vfs-term-out')">Clear</button>
+    </div>
+    <div class="terminal-output" id="vfs-term-out"></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     07 — HOW TO
+════════════════════════════════ -->
+<div class="panel" id="panel-howto">
+  <div class="section-header"><div class="section-icon">📖</div><div><h2>Complete How-To Guide</h2><p>Detailed instructions for every scenario — nothing skipped</p></div></div>
+
+  <div class="instruction-block">
+    <h3>🆕 Scenario A — Brand New Build (First Time)</h3>
+    <ol>
+      <li>Log into your MX Linux machine as <strong>uly</strong></li>
+      <li>Open terminal → type <code>su -</code> → enter root password</li>
+      <li>Go to <strong>Tab 02 — Build OS</strong></li>
+      <li>Fill in Root Password, VeraCrypt SHA256, Superbacked AppImage path</li>
+      <li>Click <strong>Generate Script</strong> → <strong>Download Script</strong></li>
+      <li>In terminal: <code>cd ~/Downloads && chmod +x build-custom-superbacked-os.sh</code></li>
+      <li>Run: <code>bash build-custom-superbacked-os.sh</code></li>
+      <li>Wait 15–30 minutes for all 19 phases</li>
+      <li>When done, customize the desktop then follow Scenario B</li>
+    </ol>
+  </div>
+
+  <div class="instruction-block">
+    <h3>🎨 Scenario B — Customize Desktop Then Snapshot</h3>
+    <ol>
+      <li>Log in as <strong>superbacked</strong> (auto-login)</li>
+      <li>Set wallpaper, arrange icons, configure theme and taskbar</li>
+      <li>Right-click each icon → <strong>Allow Launching</strong> to remove question mark</li>
+      <li>When everything looks correct — <strong>close ALL open windows</strong></li>
+      <li>Open terminal → <code>su -</code> → enter root password</li>
+      <li>Go to <strong>Tab 04 — Nuke MX Icons</strong> → Generate → Download → run it first</li>
+      <li>Then go to <strong>Tab 03 — Pre-Snapshot</strong> → Generate → Download → run it</li>
+      <li>At the end it asks: <strong>Launch mx-snapshot?</strong> → type <code>y</code></li>
+      <li>Set output folder: <code>/home/uly/CustomOS-ISO</code> → click <strong>Create Snapshot</strong></li>
+      <li>Wait 10–20 minutes for ISO to build</li>
+      <li>Follow Scenario C to flash it</li>
+    </ol>
+  </div>
+
+  <div class="instruction-block">
+    <h3>💣 Scenario C — Default MX Icons Keep Coming Back</h3>
+    <ol>
+      <li>Go to <strong>Tab 04 — Nuke MX Icons</strong></li>
+      <li>Click <strong>Generate Nuke Script</strong> → <strong>Download</strong></li>
+      <li>Open terminal → <code>su -</code> → run: <code>bash nuke-mx-icons.sh</code></li>
+      <li>The script runs 5 passes — Pass 3 searches file content (catches renamed files)</li>
+      <li>After nuke completes, immediately run the Pre-Snapshot script (Tab 03)</li>
+      <li>Then take a new mx-snapshot and flash to USB</li>
+    </ol>
+  </div>
+
+  <div class="instruction-block">
+    <h3>💾 Scenario D — Flash ISO to USB</h3>
+    <ol>
+      <li>Plug in your 128GB USB drive</li>
+      <li>Open terminal → run <code>lsblk</code> to find the USB device name</li>
+      <li>Look for: size matches USB, <strong>RM=1</strong> (removable). Usually <strong>/dev/sda</strong></li>
+      <li>Go to <strong>Tab 05 — Flash USB</strong></li>
+      <li>Enter ISO path and USB device → Generate → Download → run as root</li>
+      <li>Script wipes, flashes, syncs, verifies sha256, then ejects</li>
+      <li>Reboot → enter boot menu (F12/F2/ESC) → select USB</li>
+      <li>Login: <strong>superbacked / superbacked</strong></li>
+    </ol>
+  </div>
+
+  <div class="instruction-block">
+    <h3>📂 Scenario E — Setting Up virtiofs Folder Sharing</h3>
+    <ol>
+      <li>Go to <strong>Tab 06 — virtiofs Share</strong></li>
+      <li>Fill in host folder path, share tag name, guest mount point, and VM name</li>
+      <li>Click <strong>Generate virtiofs Setup Script</strong> → Download → run as root on host</li>
+      <li>The script creates the shared folder with correct permissions</li>
+      <li>Then follow the manual virt-manager steps (shown on that tab) to enable shared memory and add the filesystem device</li>
+      <li>Inside the VM, run the mount command generated by the script</li>
+      <li>Files in the host folder instantly appear inside the VM</li>
+    </ol>
+  </div>
+
+  <div class="instruction-block">
+    <h3>🛠 Troubleshooting</h3>
+    <ul>
+      <li><strong>Default MX icons still showing</strong> → Tab 04 — Nuke MX Icons. Pass 3 reads file content to find renamed copies.</li>
+      <li><strong>Terminal opens on every boot</strong> → Pre-snapshot script sets KDE loginMode=emptySession. Re-run it.</li>
+      <li><strong>Icons have question mark</strong> → Right-click → Allow Launching. Pre-snapshot also auto-fixes this.</li>
+      <li><strong>dd writes at 2+ GB/s</strong> → Wrong device. Run lsblk to confirm USB device name.</li>
+      <li><strong>VeraCrypt needs administrator password</strong> → Enter root password, not user password.</li>
+      <li><strong>superbacked user has sudo</strong> → Pre-snapshot script auto-removes from sudo group.</li>
+      <li><strong>Network active on boot</strong> → Pre-snapshot verifies and re-enables airgap-lockdown service.</li>
+      <li><strong>virtiofs not working</strong> → Confirm shared memory is enabled in VM Memory settings and VM was fully powered off before adding filesystem hardware.</li>
+    </ul>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <span>Superbacked OS Control Center · v2.2.0 · MX Linux + sysVinit</span>
+  <span id="footer-time"></span>
+</footer>
+
+<script>
+const scripts = { build:'', snap:'', nuke:'', flash:'', vfs:'' };
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  const map={dashboard:0,build:1,snapshot:2,nuke:3,flash:4,virtiofs:5,howto:6};
+  document.querySelectorAll('.tab')[map[name]].classList.add('active');
+}
+
+function updateClock(){
+  const n=new Date();
+  document.getElementById('clock').textContent=n.toTimeString().slice(0,8);
+  document.getElementById('footer-time').textContent=
+    n.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+setInterval(updateClock,1000); updateClock();
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function tp(id,html){ const e=document.getElementById(id); e.innerHTML+=html+'\n'; e.scrollTop=e.scrollHeight; }
+function clearTerm(id){ document.getElementById(id).innerHTML=''; }
+function cl(c,t){ return `<span class="${c}">${esc(t)}</span>`; }
+function setProgress(pfx,pct,lbl){
+  document.getElementById(pfx+'-prog-fill').style.width=pct+'%';
+  document.getElementById(pfx+'-prog-pct').textContent=pct+'%';
+  if(lbl) document.getElementById(pfx+'-prog-label').textContent=lbl;
+}
+
+function copyScript(key){
+  if(!scripts[key]) return;
+  navigator.clipboard.writeText(scripts[key]).then(()=>{
+    alert('✓ Script copied!\n\nPaste into terminal as root and run:\nbash <(xclip -selection clipboard)\n\nOR save to file and run: bash filename.sh');
+  });
+}
+function downloadScript(key,fname){
+  if(!scripts[key]) return;
+  const b=new Blob([scripts[key]],{type:'text/plain'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=fname; a.click();
+}
+
+// ── GENERATE BUILD SCRIPT ──────────────────────────────────
+function generateBuildScript(){
+  const rootPw = document.getElementById('cfg-root-pw').value.trim();
+  const userPw = document.getElementById('cfg-user-pw').value.trim()||'superbacked';
+  const vcSha  = document.getElementById('cfg-vc-sha').value.trim();
+  const sbPath = document.getElementById('cfg-sb-path').value.trim();
+  const isoDir = document.getElementById('cfg-iso-dir').value.trim()||'/home/uly/CustomOS-ISO';
+  if(!rootPw){ alert('⚠ Root Password is required.'); return; }
+  if(!vcSha) { alert('⚠ VeraCrypt SHA256 is required.\nGet it from https://veracrypt.jp/en/Downloads.html'); return; }
+
+  document.getElementById('build-terminal').style.display='block';
+  document.getElementById('build-progress').style.display='block';
+  clearTerm('build-term-out');
+
+  const phases=['Pre-Flight Checks','System Update','Install 60+ Packages','KeePassXC','VeraCrypt AppImage',
+    'Superbacked AppImage','Desktop Shortcuts','Configure Users','Sudo Lockdown','LightDM Auto-Login',
+    'Network Airgap Lockdown','RAM Wipe on Shutdown','AppArmor Hardening','Entropy Daemon (haveged)',
+    'Desktop Configuration','polkit/udev Rules','Remove Bloat','Create Desktop README','MX Snapshot ISO'];
+
+  tp('build-term-out', cl('t-cyan','  ╔═══════════════════════════════════════════╗')+'\n'+
+    cl('t-cyan','  ║  CUSTOM SUPERBACKED-STYLE OS BUILDER v2.0 ║')+'\n'+
+    cl('t-cyan','  ║  MX Linux (Debian 12) + sysVinit           ║')+'\n'+
+    cl('t-cyan','  ╚═══════════════════════════════════════════╝'));
+
+  let i=0;
+  function next(){
+    if(i>=phases.length){
+      setProgress('build',100,'Script generated ✓');
+      tp('build-term-out','\n'+cl('t-green','[✔] Script generated — click Download or Copy'));
+      document.getElementById('btn-copy-build').style.display='inline-flex';
+      document.getElementById('btn-dl-build').style.display='inline-flex';
+      return;
+    }
+    setProgress('build',Math.round((i/phases.length)*100),'Phase '+(i+1)+' — '+phases[i]);
+    tp('build-term-out','\n'+cl('t-cyan','━━ Phase '+(i+1)+' — '+phases[i]+' ━━')+'\n'+cl('t-green','[✔] '+phases[i]+' configured'));
+    i++; setTimeout(next,100);
+  }
+  next();
+  scripts.build = buildBashScript(rootPw,userPw,vcSha,sbPath,isoDir);
+}
+
+// ── GENERATE SNAPSHOT SCRIPT ───────────────────────────────
+function generateSnapshotScript(){
+  document.getElementById('snap-terminal').style.display='block';
+  document.getElementById('snap-progress').style.display='block';
+  clearTerm('snap-term-out');
+
+  const steps=['Remove Default MX Icons (All Locations)','Disable KDE Session Restore',
+    'Verify sysVinit Services','Verify User Security','Verify AppImages',
+    'Verify QR Code Tools','Verify Network Lockdown','Clear APT Cache',
+    'Clear System Logs','Clear Shell History','Clear Temp Files','Clear Caches',
+    'Clear Recently Used / KDE Activity','Clear KDE Session State',
+    'Remove Build Artifacts','Check Disk Space','Verification Summary','Launch mx-snapshot'];
+
+  let i=0;
+  function next(){
+    if(i>=steps.length){
+      setProgress('snap',100,'Script generated ✓');
+      tp('snap-term-out','\n'+cl('t-green','[✔] Script ready — click Download or Copy'));
+      document.getElementById('btn-copy-snap').style.display='inline-flex';
+      document.getElementById('btn-dl-snap').style.display='inline-flex';
+      return;
+    }
+    setProgress('snap',Math.round((i/steps.length)*100),'Step '+(i+1)+' — '+steps[i]);
+    tp('snap-term-out','\n'+cl('t-cyan','━━ Step '+(i+1)+' — '+steps[i]+' ━━')+'\n'+cl('t-green','[✔] '+steps[i]));
+    i++; setTimeout(next,90);
+  }
+  next();
+  scripts.snap = snapshotBashScript();
+}
+
+// ── GENERATE NUKE SCRIPT ───────────────────────────────────
+function generateNukeScript(){
+  document.getElementById('nuke-terminal').style.display='block';
+  clearTerm('nuke-term-out');
+
+  const passes=['Pass 1 — Known Dirs (9 locations)','Pass 2 — Filename Pattern Scan',
+    'Pass 3 — File Content Scan (Name= field)','Pass 4 — Fix Trust Flags',
+    'Pass 5 — Clear KDE Icon Cache'];
+
+  tp('nuke-term-out', cl('t-red','  ╔══════════════════════════════════╗')+'\n'+
+    cl('t-red','  ║  NUCLEAR MX ICON REMOVAL v2.2.0  ║')+'\n'+
+    cl('t-red','  ╚══════════════════════════════════╝'));
+
+  let i=0;
+  function next(){
+    if(i>=passes.length){
+      tp('nuke-term-out','\n'+cl('t-green','[✔] Nuke script generated — click Download or Copy'));
+      document.getElementById('btn-copy-nuke').style.display='inline-flex';
+      document.getElementById('btn-dl-nuke').style.display='inline-flex';
+      return;
+    }
+    tp('nuke-term-out','\n'+cl('t-yellow','━━ '+passes[i]+' ━━')+'\n'+cl('t-green','[✔] Configured'));
+    i++; setTimeout(next,150);
+  }
+  next();
+  scripts.nuke = nukeBashScript();
+}
+
+// ── GENERATE FLASH SCRIPT ──────────────────────────────────
+function generateFlashScript(){
+  const iso=document.getElementById('flash-iso-path').value.trim();
+  const usb=document.getElementById('flash-usb-dev').value.trim();
+  if(!iso||!usb){ alert('⚠ Fill in ISO path and USB device.'); return; }
+  if(!usb.startsWith('/dev/')){ alert('⚠ USB device must start with /dev/ e.g. /dev/sda'); return; }
+
+  document.getElementById('flash-terminal').style.display='block';
+  clearTerm('flash-term-out');
+
+  tp('flash-term-out',
+    cl('t-cyan','━━ Flash USB Script Generated ━━')+'\n\n'+
+    cl('t-white','ISO  : ')+cl('t-green',iso)+'\n'+
+    cl('t-white','USB  : ')+cl('t-yellow',usb)+'\n\n'+
+    cl('t-dim','# Steps:')+'\n'+
+    cl('t-blue','  1. Unmount all partitions on '+usb)+'\n'+
+    cl('t-blue','  2. Wipe partition table (wipefs + dd zero)')+'\n'+
+    cl('t-blue','  3. Flash ISO with dd (bs=4M, status=progress, conv=fsync)')+'\n'+
+    cl('t-blue','  4. sync — flush all write buffers')+'\n'+
+    cl('t-blue','  5. SHA256 integrity verification')+'\n'+
+    cl('t-blue','  6. Eject USB safely')+'\n\n'+
+    cl('t-green','[✔] Script ready — click Download or Copy'));
+
+  document.getElementById('btn-copy-flash').style.display='inline-flex';
+  document.getElementById('btn-dl-flash').style.display='inline-flex';
+  scripts.flash = flashBashScript(iso,usb);
+}
+
+// ── GENERATE VIRTIOFS SCRIPT ───────────────────────────────
+function generateVirtiofsScript(){
+  const hostPath   = document.getElementById('vfs-host-path').value.trim()   || '/home/uly/vm_share';
+  const tag        = document.getElementById('vfs-tag').value.trim()          || 'share_tag';
+  const guestMount = document.getElementById('vfs-guest-mount').value.trim()  || '/mnt/host_share';
+  const vmName     = document.getElementById('vfs-vm-name').value.trim()      || 'your-vm';
+
+  // Update the shown values in instructions
+  document.getElementById('vfs-show-host').textContent = hostPath;
+  document.getElementById('vfs-show-tag').textContent  = tag;
+
+  document.getElementById('vfs-terminal').style.display='block';
+  clearTerm('vfs-term-out');
+
+  tp('vfs-term-out',
+    cl('t-purple','━━ virtiofs Setup Script Generated ━━')+'\n\n'+
+    cl('t-white','Host path   : ')+cl('t-green',hostPath)+'\n'+
+    cl('t-white','Share tag   : ')+cl('t-cyan',tag)+'\n'+
+    cl('t-white','Guest mount : ')+cl('t-yellow',guestMount)+'\n'+
+    cl('t-white','VM name     : ')+cl('t-blue',vmName)+'\n\n'+
+    cl('t-dim','# Script will:')+'\n'+
+    cl('t-blue','  1. Create host folder: '+hostPath)+'\n'+
+    cl('t-blue','  2. Set chmod 777 for libvirt-qemu access')+'\n'+
+    cl('t-blue','  3. Print virt-manager manual steps')+'\n'+
+    cl('t-blue','  4. Generate guest mount command')+'\n'+
+    cl('t-blue','  5. Show fstab entry for auto-mount on VM boot')+'\n\n'+
+    cl('t-green','[✔] Script ready — click Download or Copy'));
+
+  document.getElementById('btn-copy-vfs').style.display='inline-flex';
+  document.getElementById('btn-dl-vfs').style.display='inline-flex';
+  scripts.vfs = virtiofsBashScript(hostPath, tag, guestMount, vmName);
+}
+
+// ══════════════════════════════════════════════════════════
+// BASH SCRIPT GENERATORS
+// ══════════════════════════════════════════════════════════
+
+function nukeBashScript(){ return `#!/bin/bash
+# =============================================================================
+# nuke-mx-icons.sh — v2.2.0
+# Nuclear removal of ALL default MX Linux desktop icons
+# 5-pass system: known dirs, filename scan, content scan, trust fix, cache clear
+# Usage: sudo bash nuke-mx-icons.sh
+# =============================================================================
+set -euo pipefail
+GREEN='\\033[0;32m'; BLUE='\\033[0;34m'; YELLOW='\\033[1;33m'; RED='\\033[0;31m'; NC='\\033[0m'
+log()  { echo -e "\${GREEN}[✔]\${NC} \$1"; }
+info() { echo -e "\${BLUE}[ℹ]\${NC} \$1"; }
+warn() { echo -e "\${YELLOW}[⚠]\${NC} \$1"; }
+[[ \$EUID -ne 0 ]] && { echo -e "\${RED}[✘]\${NC} Run as root: sudo bash \$0"; exit 1; }
+CUSTOM_USER="superbacked"
+REMOVED=0
+echo -e "\\n\${RED}━━ Nuclear MX Icon Removal — 5 Passes ━━\${NC}\\n"
+
+# Pass 1 — Known locations
+info "Pass 1 — Removing from 9 known locations..."
+KNOWN_DIRS=("/home/\$CUSTOM_USER/Desktop" "/etc/skel/Desktop" "/root/Desktop"
+  "/usr/share/applications" "/usr/local/share/applications"
+  "/run/initramfs/linux/usr/share/applications"
+  "/run/initramfs/aufs-ram/upper/home/\$CUSTOM_USER/Desktop"
+  "/run/initramfs/aufs-ram/upper/usr/share/applications"
+  "/run/initramfs/aufs-ram/upper/etc/skel/Desktop")
+KNOWN_NAMES=("FAQ.desktop" "MX-User_Manual.desktop" "MX_User_Manual.desktop"
+  "mx-user.desktop" "mx-user-manual.desktop" "MXUserManual.desktop"
+  "Installer.desktop" "mx-installer.desktop" "MXInstaller.desktop"
+  "quick-system-info.desktop" "Quick_System_Info.desktop"
+  "MX-Fluxbox_Manual.desktop" "mx-faq.desktop" "mx-manual.desktop")
+for dir in "\${KNOWN_DIRS[@]}"; do
+  [[ -d "\$dir" ]] || continue
+  for name in "\${KNOWN_NAMES[@]}"; do
+    [[ -f "\$dir/\$name" ]] && rm -f "\$dir/\$name" && info "  Removed: \$dir/\$name" && REMOVED=\$((REMOVED+1)) || true
+  done
+done
+
+# Pass 2 — Full filesystem filename pattern
+info "Pass 2 — Full filesystem filename scan..."
+while IFS= read -r -d '' found; do
+  rm -f "\$found"; info "  Nuked by name: \$found"; REMOVED=\$((REMOVED+1))
+done < <(find / -maxdepth 15 \\( \\
+  -name "*MX*User*Manual*" -o -name "*MX_User_Manual*" -o \\
+  -name "*mx-user*"        -o -name "*mxuser*"         -o \\
+  -name "*Installer*"      -o -name "*mx-installer*"   -o \\
+  -name "*mxinstaller*"    -o -name "*quick-system-info*" -o \\
+  -name "*Quick_System_Info*" -o -name "*mx-faq*" -o \\
+  -name "*MX-Fluxbox*" \\
+\\) -name "*.desktop" -print0 2>/dev/null)
+
+# Pass 3 — File content scan (catches renamed files)
+info "Pass 3 — Content scan (Name= field in every .desktop file)..."
+while IFS= read -r found; do
+  [[ -f "\$found" ]] || continue
+  rm -f "\$found"; info "  Nuked by content: \$found"; REMOVED=\$((REMOVED+1))
+done < <(grep -rl --include="*.desktop" \\
+  -e "^Name=MX User Manual" -e "^Name=Installer" \\
+  -e "^Name=FAQ" -e "^Name=Quick System Info" \\
+  -e "^Name=MX Fluxbox Manual" \\
+  / 2>/dev/null || true)
+
+# Pass 4 — Fix trust flags on remaining legitimate icons
+info "Pass 4 — Fixing trust flags on legitimate icons..."
+DESKTOP_DIR="/home/\$CUSTOM_USER/Desktop"
+[[ -d "\$DESKTOP_DIR" ]] && {
+  for f in "\$DESKTOP_DIR"/*.desktop; do
+    [[ -f "\$f" ]] || continue
+    chmod +x "\$f"
+    gio set "\$f" metadata::trusted true 2>/dev/null || true
+    attr -s user.trusted -V "yes" "\$f" 2>/dev/null || true
+    chown "\$CUSTOM_USER:\$CUSTOM_USER" "\$f"
+    info "  Trusted: \$(basename "\$f")"
+  done
+  chown -R "\$CUSTOM_USER:\$CUSTOM_USER" "\$DESKTOP_DIR"
+}
+AUFS_DESK="/run/initramfs/aufs-ram/upper/home/\$CUSTOM_USER/Desktop"
+[[ -d "\$AUFS_DESK" ]] && {
+  for f in "\$AUFS_DESK"/*.desktop; do
+    [[ -f "\$f" ]] || continue
+    chmod +x "\$f"; gio set "\$f" metadata::trusted true 2>/dev/null || true
+    chown "\$CUSTOM_USER:\$CUSTOM_USER" "\$f"
+  done
+}
+
+# Pass 5 — Clear KDE icon cache
+info "Pass 5 — Clearing KDE icon cache..."
+rm -rf "/home/\$CUSTOM_USER/.cache/kwin/"            2>/dev/null || true
+rm -rf "/home/\$CUSTOM_USER/.cache/plasma/"          2>/dev/null || true
+rm -rf "/home/\$CUSTOM_USER/.cache/plasmashell/"     2>/dev/null || true
+rm -rf "/home/\$CUSTOM_USER/.cache/ksycoca5"*        2>/dev/null || true
+rm -rf "/home/\$CUSTOM_USER/.cache/icon-cache.kcache" 2>/dev/null || true
+rm -rf /var/cache/fontconfig/                         2>/dev/null || true
+update-desktop-database /usr/share/applications 2>/dev/null || true
+
+echo ""
+echo -e "\${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\${NC}"
+log "DONE. Total removed: \$REMOVED files"
+echo -e "\${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\${NC}"
+info "Now run pre-snapshot-cleanup.sh then mx-snapshot."
+`; }
+
+function snapshotBashScript(){ return `#!/bin/bash
+# =============================================================================
+# pre-snapshot-cleanup.sh — v2.2.0
+# Run AFTER desktop customization, BEFORE mx-snapshot
+# Generated by Superbacked OS Control Center
+# Usage: sudo bash pre-snapshot-cleanup.sh
+# =============================================================================
+set -euo pipefail
+CUSTOM_USER="superbacked"
+DESKTOP_DIR="/home/\$CUSTOM_USER/Desktop"
+REPORT_FILE="/root/pre-snapshot-report.txt"
+RED='\\033[0;31m'; GREEN='\\033[0;32m'; YELLOW='\\033[1;33m'
+BLUE='\\033[0;34m'; CYAN='\\033[0;36m'; BOLD='\\033[1m'; NC='\\033[0m'
+FAILURES=0
+log()  { echo -e "\${GREEN}[✔]\${NC} \$1" | tee -a "\$REPORT_FILE"; }
+info() { echo -e "\${BLUE}[ℹ]\${NC} \$1" | tee -a "\$REPORT_FILE"; }
+warn() { echo -e "\${YELLOW}[⚠]\${NC} \$1" | tee -a "\$REPORT_FILE"; }
+pass() { echo -e "\${GREEN}[PASS]\${NC} \$1" | tee -a "\$REPORT_FILE"; }
+fail() { echo -e "\${RED}[FAIL]\${NC} \$1" | tee -a "\$REPORT_FILE"; FAILURES=\$((FAILURES+1)); }
+section() { echo -e "\\n\${BOLD}\${CYAN}━━ \$1 ━━\${NC}\\n" | tee -a "\$REPORT_FILE"; }
+[[ \$EUID -ne 0 ]] && { echo -e "\${RED}[✘]\${NC} Run as root: sudo bash \$0"; exit 1; }
+{ echo "PRE-SNAPSHOT REPORT — \$(date)"; echo ""; } > "\$REPORT_FILE"
+read -rp "All windows closed? Ready to clean? [y/N]: " r; [[ "\$r" =~ ^[Yy]\$ ]] || exit 0
+
+section "Step 1 — Nuke MX Icons"
+DEFAULT_MX_ICONS=(FAQ.desktop MX-User_Manual.desktop MX_User_Manual.desktop Installer.desktop
+  mx-installer.desktop mx-user.desktop mx-faq.desktop mx-manual.desktop
+  quick-system-info.desktop Quick_System_Info.desktop MX-Fluxbox_Manual.desktop)
+SEARCH_DIRS=("\$DESKTOP_DIR" /etc/skel/Desktop /root/Desktop /usr/share/applications
+  /usr/local/share/applications /run/initramfs/linux/usr/share/applications
+  "/run/initramfs/aufs-ram/upper/home/\$CUSTOM_USER/Desktop"
+  /run/initramfs/aufs-ram/upper/usr/share/applications
+  /run/initramfs/aufs-ram/upper/etc/skel/Desktop)
+REMOVED=0
+for dir in "\${SEARCH_DIRS[@]}"; do
+  [[ -d "\$dir" ]] || continue
+  for icon in "\${DEFAULT_MX_ICONS[@]}"; do
+    [[ -f "\$dir/\$icon" ]] && rm -f "\$dir/\$icon" && REMOVED=\$((REMOVED+1)) || true
+  done
+done
+while IFS= read -r -d '' found; do rm -f "\$found"; REMOVED=\$((REMOVED+1))
+done < <(find / -maxdepth 15 \\( -name "*MX*User*Manual*" -o -name "*mx-user*" -o
+  -name "*Installer*" -o -name "*mx-installer*" -o -name "*quick-system-info*" -o
+  -name "*mx-faq*" -o -name "*MX-Fluxbox*" \\) -name "*.desktop" -print0 2>/dev/null)
+while IFS= read -r found; do [[ -f "\$found" ]] && rm -f "\$found" && REMOVED=\$((REMOVED+1)) || true
+done < <(grep -rl --include="*.desktop" -e "^Name=MX User Manual" -e "^Name=Installer" \\
+  -e "^Name=FAQ" -e "^Name=Quick System Info" / 2>/dev/null || true)
+log "MX icons nuked: \$REMOVED files"
+
+[[ -d "\$DESKTOP_DIR" ]] && {
+  for f in "\$DESKTOP_DIR"/*.desktop; do
+    [[ -f "\$f" ]] || continue
+    chmod +x "\$f"; gio set "\$f" metadata::trusted true 2>/dev/null || true
+    attr -s user.trusted -V "yes" "\$f" 2>/dev/null || true
+    chown "\$CUSTOM_USER:\$CUSTOM_USER" "\$f"
+  done
+  chown -R "\$CUSTOM_USER:\$CUSTOM_USER" "\$DESKTOP_DIR"
+}
+AUFS="/run/initramfs/aufs-ram/upper/home/\$CUSTOM_USER/Desktop"
+[[ -d "\$AUFS" ]] && for f in "\$AUFS"/*.desktop; do
+  [[ -f "\$f" ]] && chmod +x "\$f" && gio set "\$f" metadata::trusted true 2>/dev/null || true
+done
+
+section "Step 2 — KDE Session"
+mkdir -p "/home/\$CUSTOM_USER/.config"
+printf '[General]\nloginMode=emptySession\n' > "/home/\$CUSTOM_USER/.config/ksmserverrc"
+printf '[Wallet]\nEnabled=false\nFirst Use=false\n' > "/home/\$CUSTOM_USER/.config/kwalletrc"
+rm -rf "/home/\$CUSTOM_USER/.local/share/ksmserver/"   2>/dev/null || true
+rm -rf "/home/\$CUSTOM_USER/.config/ksmserver-"*       2>/dev/null || true
+rm -f  "/home/\$CUSTOM_USER/.config/session/"*         2>/dev/null || true
+chown -R "\$CUSTOM_USER:\$CUSTOM_USER" "/home/\$CUSTOM_USER/.config/" 2>/dev/null || true
+log "KDE session cleared and set to emptySession."
+
+section "Step 3 — sysVinit Services"
+for svc in airgap-lockdown haveged ufw apparmor lightdm; do
+  [[ ! -f "/etc/init.d/\$svc" ]] && { fail "Missing: /etc/init.d/\$svc"; continue; }
+  ls /etc/rc2.d/S*"\$svc" &>/dev/null 2>&1 && pass "Enabled: \$svc" || {
+    warn "Not enabled: \$svc — fixing..."; update-rc.d "\$svc" defaults 2>/dev/null && log "Fixed: \$svc" || fail "Could not fix: \$svc"; }
+done
+[[ -f /etc/init.d/wipe-ram ]] && {
+  { ls /etc/rc0.d/*wipe-ram &>/dev/null 2>&1 || ls /etc/rc6.d/*wipe-ram &>/dev/null 2>&1; } && \\
+    pass "wipe-ram at runlevels 0+6" || { update-rc.d wipe-ram stop 01 0 6 . 2>/dev/null && log "Fixed wipe-ram" || fail "wipe-ram fix failed"; }
+} || fail "wipe-ram missing"
+
+section "Step 4 — User Security"
+id "\$CUSTOM_USER" &>/dev/null && pass "User exists" || fail "User missing: \$CUSTOM_USER"
+groups "\$CUSTOM_USER" | grep -qw sudo && { gpasswd -d "\$CUSTOM_USER" sudo 2>/dev/null && log "Removed from sudo" || fail "Could not remove from sudo"; } || pass "Not in sudo group"
+[[ \$(passwd -S root 2>/dev/null | awk '{print \$2}') == "P" ]] && pass "Root password set" || fail "Root password NOT set"
+
+section "Step 5 — AppImages"
+for app in /opt/veracrypt.AppImage /opt/superbacked.AppImage; do
+  [[ -f "\$app" ]] || { warn "Missing: \$app"; continue; }
+  [[ -x "\$app" ]] || chmod +x "\$app"
+  pass "OK: \$(basename \$app)"
+done
+command -v keepassxc &>/dev/null && pass "KeePassXC installed" || fail "KeePassXC missing"
+
+section "Step 6 — QR Tools"
+for tool in zbarcam zbarimg qrencode fswebcam v4l2-ctl; do
+  command -v "\$tool" &>/dev/null && pass "\$tool" || fail "Missing: \$tool"
+done
+
+section "Step 7 — Network Lockdown"
+ufw status 2>/dev/null | grep -q "active" && pass "UFW active" || { ufw --force enable && log "UFW enabled" || fail "UFW failed"; }
+ls /etc/rc2.d/S*NetworkManager &>/dev/null 2>&1 && { update-rc.d NetworkManager disable 2>/dev/null; warn "NetworkManager disabled"; } || pass "NetworkManager disabled"
+
+section "Step 8 — Cleanup"
+apt-get clean -qq; apt-get autoremove -y -qq 2>/dev/null || true; apt-get autoclean -y -qq 2>/dev/null || true; log "APT cache cleared"
+find /var/log -type f \\( -name "*.log" -o -name "syslog" -o -name "messages" -o -name "auth.log" \\) -exec truncate -s 0 {} \\; 2>/dev/null || true
+truncate -s 0 /var/log/wtmp /var/log/lastlog /var/log/btmp 2>/dev/null || true
+journalctl --vacuum-size=1M 2>/dev/null || true; log "Logs cleared"
+history -c 2>/dev/null || true
+cat /dev/null > /root/.bash_history 2>/dev/null || true
+cat /dev/null > "/home/\$CUSTOM_USER/.bash_history" 2>/dev/null || true; log "History cleared"
+rm -rf /tmp/* /tmp/.* /var/tmp/* 2>/dev/null || true; log "Temp cleared"
+rm -rf "/home/\$CUSTOM_USER/.cache/thumbnails/" "/home/\$CUSTOM_USER/.cache/mozilla/" 2>/dev/null || true
+rm -rf "/home/\$CUSTOM_USER/.cache/kwin/" "/home/\$CUSTOM_USER/.cache/plasma/" "/home/\$CUSTOM_USER/.cache/plasmashell/" 2>/dev/null || true
+rm -rf "/home/\$CUSTOM_USER/.cache/ksycoca5"* 2>/dev/null || true; log "Caches cleared"
+cat /dev/null > "/home/\$CUSTOM_USER/.local/share/recently-used.xbel" 2>/dev/null || true
+rm -f "/home/\$CUSTOM_USER/.local/share/RecentDocuments/"*.desktop 2>/dev/null || true
+rm -rf "/home/\$CUSTOM_USER/.local/share/kactivitymanagerd/" 2>/dev/null || true; log "Recent files cleared"
+find /root /home -maxdepth 3 \\( -name "*.deb" -o -name "*.tar.bz2" -o -name "*.tar.gz" -o -name "*.zip" \\) -exec rm -f {} \\; 2>/dev/null || true; log "Build artifacts removed"
+
+section "Summary"
+AVAIL=\$(df / | awk 'NR==2 {printf "%d", \$4/1024/1024}')
+USED=\$(df /  | awk 'NR==2 {printf "%d", \$3/1024/1024}')
+info "Disk: \${USED}GB used / \${AVAIL}GB free"
+[[ \$FAILURES -eq 0 ]] && {
+  echo -e "\\n\${GREEN}\${BOLD}  ╔══════════════════════════════════════════╗"
+  echo "  ║  ALL CHECKS PASSED — READY FOR SNAPSHOT  ║"
+  echo -e "  ╚══════════════════════════════════════════╝\${NC}\\n"
+  log "System clean and verified."
+} || { warn "\$FAILURES check(s) failed — review above"; }
+info "Report: \$REPORT_FILE"
+echo ""
+echo -e "\${YELLOW}⚠  Confirm ALL windows are CLOSED before snapshot.\${NC}"
+echo ""
+read -rp "Launch mx-snapshot now? [y/N]: " resp
+[[ "\$resp" =~ ^[Yy]\$ ]] && {
+  command -v mx-snapshot &>/dev/null && mx-snapshot || warn "Install mx-snapshot: sudo apt install mx-snapshot"
+} || { info "Run manually: sudo mx-snapshot"; info "Then flash: sudo dd if=~/CustomOS-ISO/<snap>.iso of=/dev/sdX bs=4M status=progress conv=fsync"; }
+`; }
+
+function buildBashScript(rootPw,userPw,vcSha,sbPath,isoDir){ return `#!/bin/bash
+# =============================================================================
+# build-custom-superbacked-os.sh — v2.0.0
+# Custom Superbacked-Style Live OS Builder — MX Linux + sysVinit
+# Generated by Superbacked OS Control Center
+# Usage: sudo bash build-custom-superbacked-os.sh
+# =============================================================================
+set -euo pipefail
+CUSTOM_USER="superbacked"
+CUSTOM_USER_PASSWORD="${userPw}"
+ROOT_PASSWORD="${rootPw}"
+ISO_OUTPUT_DIR="${isoDir}"
+VERACRYPT_APPIMAGE_URL="https://launchpad.net/veracrypt/trunk/1.26.24/+download/VeraCrypt-1.26.24-x86_64.AppImage"
+VERACRYPT_APPIMAGE_SHA256="${vcSha}"
+SUPERBACKED_APPIMAGE_PATH="${sbPath}"
+RED='\\033[0;31m'; GREEN='\\033[0;32m'; YELLOW='\\033[1;33m'; BLUE='\\033[0;34m'; CYAN='\\033[0;36m'; BOLD='\\033[1m'; NC='\\033[0m'
+log()   { echo -e "\${GREEN}[✔]\${NC} \$1"; }
+info()  { echo -e "\${BLUE}[ℹ]\${NC} \$1"; }
+warn()  { echo -e "\${YELLOW}[⚠]\${NC} \$1"; }
+error() { echo -e "\${RED}[✘]\${NC} \$1"; exit 1; }
+section(){ echo -e "\\n\${BOLD}\${CYAN}━━ \$1 ━━\${NC}\\n"; }
+sysv_enable(){ [[ -f "/etc/init.d/\$1" ]] && update-rc.d "\$1" defaults 2>/dev/null && log "Enabled: \$1" || warn "Could not enable \$1"; }
+sysv_start() { [[ -f "/etc/init.d/\$1" ]] && /etc/init.d/"\$1" start 2>/dev/null || true; }
+[[ \$EUID -ne 0 ]] && error "Run as root: sudo bash \$0"
+[[ -z "\$ROOT_PASSWORD" ]] && error "ROOT_PASSWORD not set"
+ping -c1 8.8.8.8 &>/dev/null || ping -c1 google.com &>/dev/null || curl -s --max-time 5 https://google.com &>/dev/null || error "No internet"
+echo -e "\${BOLD}\${CYAN}\\n  ╔══════════════════════════════════════════╗\\n  ║  CUSTOM OS BUILDER v2.0.0 — sysVinit     ║\\n  ╚══════════════════════════════════════════╝\${NC}\\n"
+read -rp "Continue? [y/N]: " r; [[ "\$r" =~ ^[Yy]\$ ]] || exit 0
+section "Phase 1 — Update"; apt-get update -qq && apt-get upgrade -y -qq; log "Updated"
+section "Phase 2 — Packages"
+PKGS=(sysvinit-utils insserv cryptsetup cryptsetup-bin dmsetup fuse libfuse2 parted gparted
+  exfatprogs dosfstools ntfs-3g util-linux zbar-tools libzbar0 v4l-utils fswebcam
+  gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good
+  gstreamer1.0-plugins-bad gstreamer1.0-libav v4l2loopback-dkms
+  qrencode libqrencode4 imagemagick python3 python3-pip python3-pil
+  python3-numpy python3-zbar guvcview ufw apparmor apparmor-profiles apparmor-utils
+  secure-delete bleachbit haveged rng-tools gnupg2 pinentry-gtk2
+  xfce4 xfce4-terminal xfce4-screensaver xfce4-power-manager xfce4-notifyd
+  thunar thunar-volman lightdm lightdm-gtk-greeter fonts-liberation fonts-dejavu
+  xfonts-base fonts-noto cups cups-pdf evince file-roller xarchiver
+  usbutils pciutils lshw htop wget curl rsync unzip tar bzip2 xz-utils
+  xdg-utils xdg-user-dirs desktop-file-utils mx-snapshot keepassxc)
+for pkg in "\${PKGS[@]}"; do dpkg -l "\$pkg" &>/dev/null 2>&1 || apt-get install -y -qq "\$pkg" 2>/dev/null || warn "Could not install: \$pkg"; done
+log "All packages installed"
+section "Phase 3 — VeraCrypt AppImage"
+VERACRYPT_DEST="/opt/veracrypt.AppImage"
+[[ ! -f "\$VERACRYPT_DEST" ]] && {
+  wget -q --show-progress "\$VERACRYPT_APPIMAGE_URL" -O "\$VERACRYPT_DEST" || error "Download failed"
+  chmod +x "\$VERACRYPT_DEST"
+  [[ -n "\$VERACRYPT_APPIMAGE_SHA256" ]] && {
+    ACTUAL=\$(sha256sum "\$VERACRYPT_DEST"|awk '{print \$1}')
+    [[ "\$ACTUAL" != "\$VERACRYPT_APPIMAGE_SHA256" ]] && { rm -f "\$VERACRYPT_DEST"; error "Checksum mismatch"; }
+    log "Checksum verified"
+  }
+}; log "VeraCrypt ready"
+section "Phase 4 — Superbacked AppImage"
+[[ -n "\$SUPERBACKED_APPIMAGE_PATH" ]] && [[ -f "\$SUPERBACKED_APPIMAGE_PATH" ]] && {
+  cp "\$SUPERBACKED_APPIMAGE_PATH" /opt/superbacked.AppImage && chmod +x /opt/superbacked.AppImage && log "Superbacked installed"
+} || warn "Superbacked AppImage not found — add manually to /opt/superbacked.AppImage"
+section "Phase 5 — Desktop Shortcuts"
+DDIR="/home/\$CUSTOM_USER/Desktop"; mkdir -p "\$DDIR"
+cat > /usr/share/applications/veracrypt-custom.desktop << 'EOF'
+[Desktop Entry]
+Name=VeraCrypt
+Exec=/opt/veracrypt.AppImage
+Icon=veracrypt
+Terminal=false
+Type=Application
+Categories=Security;Utility;
+EOF
+cat > /usr/share/applications/keepassxc-custom.desktop << 'EOF'
+[Desktop Entry]
+Name=KeePassXC
+Exec=keepassxc
+Icon=keepassxc
+Terminal=false
+Type=Application
+Categories=Security;Utility;
+EOF
+for f in veracrypt-custom keepassxc-custom; do
+  cp "/usr/share/applications/\${f}.desktop" "\$DDIR/"
+  chmod +x "\$DDIR/\${f}.desktop"
+  gio set "\$DDIR/\${f}.desktop" metadata::trusted true 2>/dev/null || true
+done
+[[ -f /opt/superbacked.AppImage ]] && {
+  cat > "\$DDIR/superbacked-custom.desktop" << 'EOF'
+[Desktop Entry]
+Name=Superbacked
+Exec=/opt/superbacked.AppImage
+Icon=superbacked
+Terminal=false
+Type=Application
+Categories=Security;Utility;
+EOF
+  chmod +x "\$DDIR/superbacked-custom.desktop"
+  gio set "\$DDIR/superbacked-custom.desktop" metadata::trusted true 2>/dev/null || true
+}
+chown -R "\$CUSTOM_USER:\$CUSTOM_USER" "\$DDIR"; log "Shortcuts created"
+section "Phase 6 — Users"
+id "\$CUSTOM_USER" &>/dev/null || useradd -m -s /bin/bash "\$CUSTOM_USER"
+echo "\$CUSTOM_USER:\$CUSTOM_USER_PASSWORD" | chpasswd
+echo "root:\$ROOT_PASSWORD" | chpasswd
+usermod -aG audio,video,cdrom,plugdev,dialout "\$CUSTOM_USER"
+gpasswd -d "\$CUSTOM_USER" sudo 2>/dev/null || true
+gpasswd -d "\$CUSTOM_USER" adm  2>/dev/null || true; log "Users configured"
+section "Phase 7 — Sudo Lockdown"
+cat > /etc/sudoers.d/99-custom-os-lockdown << EOF
+Defaults env_reset
+root    ALL=(ALL:ALL) ALL
+\$CUSTOM_USER    ALL=(ALL) !ALL
+EOF
+chmod 440 /etc/sudoers.d/99-custom-os-lockdown; log "Sudo locked"
+section "Phase 8 — LightDM"
+mkdir -p /etc/lightdm/lightdm.conf.d/
+cat > /etc/lightdm/lightdm.conf.d/50-custom-autologin.conf << EOF
+[Seat:*]
+autologin-user=\$CUSTOM_USER
+autologin-user-timeout=0
+user-session=plasma
+greeter-session=lightdm-gtk-greeter
+EOF
+sysv_enable lightdm; log "Auto-login configured"
+section "Phase 9 — Airgap Lockdown"
+ufw --force reset; ufw default deny incoming; ufw default deny outgoing; ufw --force enable; sysv_enable ufw
+update-rc.d NetworkManager disable 2>/dev/null || true
+cat > /etc/init.d/airgap-lockdown << 'INITEOF'
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: airgap-lockdown
+# Default-Start: 2 3 4 5
+# Default-Stop:  0 1 6
+# Short-Description: Airgap network lockdown
+### END INIT INFO
+case "\$1" in
+  start)
+    for iface in \$(ip link show 2>/dev/null|grep -E '^[0-9]+:'|awk -F': ' '{print \$2}'|sed 's/@.*//'|grep -v '^lo\$'); do
+      ip link set "\$iface" down 2>/dev/null; done
+    pkill -f dhclient 2>/dev/null||true; pkill -f wpa_supplicant 2>/dev/null||true
+    logger "airgap-lockdown: complete" ;;
+  *) echo "nothing to do" ;;
+esac; exit 0
+INITEOF
+chmod +x /etc/init.d/airgap-lockdown; sysv_enable airgap-lockdown; log "Airgap configured"
+section "Phase 10 — RAM Wipe"
+command -v sdmem &>/dev/null && {
+  cat > /etc/init.d/wipe-ram << 'WIPEEOF'
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: wipe-ram
+# Default-Start:
+# Default-Stop: 0 6
+# Short-Description: Secure RAM wipe
+### END INIT INFO
+case "\$1" in
+  stop) sdmem -f -v 2>/dev/null||true ;;
+  *) echo "nothing to do" ;;
+esac; exit 0
+WIPEEOF
+  chmod +x /etc/init.d/wipe-ram
+  update-rc.d wipe-ram stop 01 0 6 . 2>/dev/null && log "RAM wipe configured" || warn "RAM wipe setup failed"
+} || warn "sdmem not found"
+section "Phase 11 — AppArmor + Entropy"
+sysv_enable apparmor; sysv_start apparmor
+[[ -f /etc/default/grub ]] && ! grep -q "apparmor=1" /etc/default/grub && {
+  sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\\(.*\\)"/GRUB_CMDLINE_LINUX_DEFAULT="\\1 apparmor=1 security=apparmor"/' /etc/default/grub
+  update-grub 2>/dev/null || true; }
+sysv_enable haveged; sysv_start haveged; log "AppArmor + haveged enabled"
+section "Phase 12 — KDE Config"
+mkdir -p "/home/\$CUSTOM_USER/.config"
+printf '[General]\\nloginMode=emptySession\\n' > "/home/\$CUSTOM_USER/.config/ksmserverrc"
+printf '[Wallet]\\nEnabled=false\\nFirst Use=false\\n' > "/home/\$CUSTOM_USER/.config/kwalletrc"
+chown -R "\$CUSTOM_USER:\$CUSTOM_USER" "/home/\$CUSTOM_USER"; log "KDE configured"
+section "Phase 13 — polkit"
+mkdir -p /etc/polkit-1/localauthority/50-local.d/
+cat > /etc/polkit-1/localauthority/50-local.d/10-custom-storage.pkla << EOF
+[Allow mount]
+Identity=unix-user:\$CUSTOM_USER
+Action=org.freedesktop.udisks2.filesystem-mount;org.freedesktop.udisks2.filesystem-mount-other-seat
+ResultAny=yes
+ResultInactive=yes
+ResultActive=yes
+EOF
+log "polkit configured"
+section "Phase 14 — Cleanup + README"
+for pkg in thunderbird rhythmbox totem aisleriot gnome-games transmission-gtk; do
+  dpkg -l "\$pkg" &>/dev/null 2>&1 && apt-get remove -y -qq "\$pkg" 2>/dev/null || true; done
+apt-get autoremove -y -qq; apt-get autoclean -y -qq
+cat > "/home/\$CUSTOM_USER/Desktop/README.txt" << EOF
+CUSTOM SECURE OS — QUICK REFERENCE
+USER: \$CUSTOM_USER / \$CUSTOM_USER_PASSWORD
+ROOT: su -  (root password known only to builder)
+APPS: /opt/veracrypt.AppImage | keepassxc | /opt/superbacked.AppImage
+QR:   zbarcam /dev/video0 | qrencode -o ~/qr.png "text"
+NET:  DISABLED by default (airgap-lockdown at every boot)
+EOF
+chown "\$CUSTOM_USER:\$CUSTOM_USER" "/home/\$CUSTOM_USER/Desktop/README.txt"; log "Done"
+section "Phase 15 — MX Snapshot"
+mkdir -p "\$ISO_OUTPUT_DIR"
+command -v mx-snapshot &>/dev/null && mx-snapshot || warn "Run manually: sudo mx-snapshot"
+echo -e "\\n\${GREEN}\${BOLD}  ╔══════════════════════════════════════╗\\n  ║  BUILD COMPLETE — 15 PHASES DONE     ║\\n  ╚══════════════════════════════════════╝\${NC}\\n"
+`; }
+
+function flashBashScript(iso,usb){ return `#!/bin/bash
+# flash-usb.sh — Flash ISO to USB
+# ISO: ${iso} | USB: ${usb}
+# Usage: sudo bash flash-usb.sh
+set -euo pipefail
+ISO_PATH="${iso}"; USB_DEV="${usb}"
+RED='\\033[0;31m'; GREEN='\\033[0;32m'; YELLOW='\\033[1;33m'; BLUE='\\033[0;34m'; NC='\\033[0m'
+log()   { echo -e "\${GREEN}[✔]\${NC} \$1"; }
+info()  { echo -e "\${BLUE}[ℹ]\${NC} \$1"; }
+error() { echo -e "\${RED}[✘]\${NC} \$1"; exit 1; }
+[[ \$EUID -ne 0 ]] && error "Run as root: sudo bash \$0"
+[[ ! -f "\$ISO_PATH" ]] && error "ISO not found: \$ISO_PATH"
+[[ ! -b "\$USB_DEV"  ]] && error "USB device not found: \$USB_DEV"
+echo -e "\\n\${RED}⚠  WARNING: This overwrites \$USB_DEV permanently\${NC}"
+lsblk "\$USB_DEV" 2>/dev/null || true
+echo ""; read -rp "Type YES to confirm: " c; [[ "\$c" == "YES" ]] || { echo "Aborted."; exit 0; }
+for p in "\${USB_DEV}"*; do umount "\$p" 2>/dev/null || true; done; log "Unmounted"
+wipefs --all "\$USB_DEV" 2>/dev/null || true
+dd if=/dev/zero of="\$USB_DEV" bs=1M count=4 status=none 2>/dev/null || true; log "Wiped"
+info "Flashing — expected speed 50-200 MB/s..."
+dd if="\$ISO_PATH" of="\$USB_DEV" bs=4M status=progress conv=fsync
+sync; log "Sync complete"
+info "Verifying SHA256..."
+ISO_SHA=\$(sha256sum "\$ISO_PATH"|awk '{print \$1}')
+USB_SHA=\$(dd if="\$USB_DEV" bs=4M status=none 2>/dev/null|head -c "\$(stat -c%s "\$ISO_PATH")"|sha256sum|awk '{print \$1}')
+[[ "\$ISO_SHA" == "\$USB_SHA" ]] && log "SHA256 verified — perfect copy" || warn "SHA256 mismatch — try again"
+eject "\$USB_DEV" 2>/dev/null || true; log "USB ejected"
+echo -e "\\n\${GREEN}✔  FLASH COMPLETE — Unplug USB, boot from it, login: superbacked/superbacked\${NC}\\n"
+`; }
+
+function virtiofsBashScript(hostPath,tag,guestMount,vmName){ return `#!/bin/bash
+# =============================================================================
+# setup-virtiofs.sh
+# virtiofs shared folder setup — MX Linux host side
+# Host path  : ${hostPath}
+# Share tag  : ${tag}
+# Guest mount: ${guestMount}
+# VM name    : ${vmName}
+# Usage: sudo bash setup-virtiofs.sh
+# =============================================================================
+set -euo pipefail
+HOST_PATH="${hostPath}"
+SHARE_TAG="${tag}"
+GUEST_MOUNT="${guestMount}"
+VM_NAME="${vmName}"
+GREEN='\\033[0;32m'; BLUE='\\033[0;34m'; YELLOW='\\033[1;33m'; CYAN='\\033[0;36m'; NC='\\033[0m'
+log()  { echo -e "\${GREEN}[✔]\${NC} \$1"; }
+info() { echo -e "\${BLUE}[ℹ]\${NC} \$1"; }
+warn() { echo -e "\${YELLOW}[⚠]\${NC} \$1"; }
+[[ \$EUID -ne 0 ]] && { echo "Run as root: sudo bash \$0"; exit 1; }
+
+echo -e "\\n\${CYAN}━━ virtiofs Shared Folder Setup ━━\${NC}\\n"
+info "Host path  : \$HOST_PATH"
+info "Share tag  : \$SHARE_TAG"
+info "Guest mount: \$GUEST_MOUNT"
+info "VM name    : \$VM_NAME"
+echo ""
+
+# Step 1 — Create shared folder on host
+info "Step 1 — Creating shared folder on host..."
+mkdir -p "\$HOST_PATH"
+chmod 777 "\$HOST_PATH"
+log "Created: \$HOST_PATH (chmod 777 for libvirt-qemu access)"
+
+# Step 2 — Ensure virtiofsd is available
+info "Step 2 — Checking virtiofsd availability..."
+if command -v virtiofsd &>/dev/null || ls /usr/lib/qemu/virtiofsd &>/dev/null 2>&1 || ls /usr/libexec/virtiofsd &>/dev/null 2>&1; then
+  log "virtiofsd found"
+else
+  warn "virtiofsd not found — installing qemu packages..."
+  apt-get install -y -qq qemu-system-x86 qemu-utils 2>/dev/null || warn "Could not install — check manually"
+fi
+
+# Step 3 — Print virt-manager manual steps
+echo ""
+echo -e "\${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\${NC}"
+echo -e "\${YELLOW}MANUAL STEPS IN VIRT-MANAGER (VM must be OFF):\${NC}"
+echo -e "\${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\${NC}"
+echo ""
+echo "  1. Open Virtual Machine Manager"
+echo "  2. Click on VM: \$VM_NAME — do NOT start it"
+echo "  3. Click Lightbulb icon (Show virtual hardware details)"
+echo "  4. Click Memory in left panel"
+echo "  5. Check: Enable shared memory → Apply"
+echo ""
+echo "  6. Click Add Hardware → select Filesystem"
+echo "  7. Driver        : virtiofs"
+echo "  8. Source path   : \$HOST_PATH"
+echo "  9. Target path   : \$SHARE_TAG  (label, not a real path)"
+echo "  10. Click Finish"
+echo ""
+echo -e "\${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\${NC}"
+
+# Step 4 — Print guest commands
+echo ""
+echo -e "\${YELLOW}COMMANDS TO RUN INSIDE THE VM (after boot):\${NC}"
+echo ""
+echo "  # Create mount point inside VM:"
+echo "  sudo mkdir -p \$GUEST_MOUNT"
+echo ""
+echo "  # Mount the virtiofs share:"
+echo "  sudo mount -t virtiofs \$SHARE_TAG \$GUEST_MOUNT"
+echo ""
+echo "  # Verify it works:"
+echo "  ls \$GUEST_MOUNT"
+echo ""
+
+# Step 5 — Print fstab entry for auto-mount
+echo -e "\${YELLOW}FOR AUTO-MOUNT ON VM BOOT — add to /etc/fstab inside VM:\${NC}"
+echo ""
+echo "  \$SHARE_TAG  \$GUEST_MOUNT  virtiofs  defaults  0  0"
+echo ""
+echo "  Then run inside VM: sudo mount -a"
+echo ""
+
+echo -e "\${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\${NC}"
+log "Host-side setup complete."
+log "Shared folder ready at: \$HOST_PATH"
+warn "Complete the virt-manager steps above before starting the VM."
+echo -e "\${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\${NC}\\n"
+`; }
+</script>
+</body>
+</html>
