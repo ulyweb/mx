@@ -612,7 +612,7 @@ chmod 777 ~/vm_share
     sudo mkdir /mnt/host_share
 
     # Mount the virtiofs tag to that folder
-    sudo mount -t virtiofs share_tag /mnt/host_share
+    sudo mount -t virtiofs vmshare_tag /mnt/host_share
 
 ```
 
