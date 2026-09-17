@@ -562,6 +562,72 @@ So now you have:
 
 ---
 
+Based on verbatim, the error `Unable to find a satisfying virtiofsd` occurs because your MX Linux host is missing the background service daemon required to manage the shared filesystem.
+
+While you configured the Virtual Machine Manager GUI correctly, the underlying QEMU/KVM hypervisor cannot execute the sharing process without the `virtiofsd` package installed on the host machine.
+
+Here is how to resolve this error on your host machine before attempting to start the VM again:
+
+1. **Install the virtiofs daemon:** 1 min.
+Open the terminal on your MX Linux **host** (not the VM) and install the missing package.
+
+```bash
+sudo apt update
+sudo apt install virtiofsd
+
+```
+
+*Verification:* The terminal will confirm the successful installation of the `virtiofsd` package.
+
+
+2. **Restart the libvirt service:** 1 min.
+Since we are using systemd based on your prior configuration, restart the virtualization daemon so it can detect the newly installed `virtiofsd` binary.
+
+```bash
+sudo systemctl restart libvirtd
+
+```
+
+*Verification:* The command will execute silently without returning any errors, confirming the service has refreshed.
+
+
+3. **Start the VM:** 1 min.
+Return to the Virtual Machine Manager GUI and click the play button to power on your VM.
+*Verification:* The error message shown in "Screenshot_20260916_181757.png" will no longer appear, and the guest OS will successfully boot to the desktop.
+
+
+Once the VM boots, you can proceed with the terminal commands you outlined (`sudo mount -t virtiofs...`) inside the guest OS to complete the connection.
+
+---
+
+
+If your MX Linux host is running sysVinit (which is the default init system for MX Linux) instead of systemd, the `systemctl` command from the previous step will return an error.
+
+To resolve the `virtiofsd` error on a sysVinit system, you simply need to use the standard `service` command to restart the virtualization daemon so it detects the newly installed package.
+
+You can note this alternative in your verbatim "Designing Linux OS Airgap" file for accurate record-keeping depending on how you boot the host.
+
+1. **Restart libvirt via sysVinit:** 1 min.
+Run the following command in your host's terminal to restart the service using the sysVinit service manager:
+
+```bash
+sudo service libvirtd restart
+
+```
+
+*Verification:* The terminal will typically output an `[ ok ] Restarting libvirtd daemon` message, confirming the service has been successfully refreshed.
+
+
+2. **Start the VM:** 1 min.
+Return to the Virtual Machine Manager GUI and click the play button to power on your VM.
+*Verification:* The error message shown in your screenshot will no longer appear, and the guest OS will successfully boot to the desktop.
+
+
+Once the VM boots, you can safely proceed with your guest terminal commands (`sudo mount -t virtiofs...`) to mount the shared folder.
+
+
+
+---
 
 To share files between your MX Linux host and a VM simultaneously, we need to clear up a very common misconception about how virtual disks work.
 
