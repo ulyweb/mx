@@ -1,1 +1,6 @@
 Test
+
+````
+mkdir -p ~/Downloads/macos_ipsw && curl -L -C - --retry 5 -o ~/Downloads/macos_ipsw/UniversalMac_26.6.2_25G83_Restore.ipsw "https://updates.cdn-apple.com/2026SummerFCS/fullrestores/140-75212/A2A24B94-1FC1-45A3-93F7-C51B02AF1F4D/UniversalMac_26.6.2_25G83_Restore.ipsw"
+
+````
